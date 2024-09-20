@@ -24,11 +24,12 @@ def log_metrics(epoch, batch_size, learning_rate, loss, epoch_time, gpu_mem, tot
         f.write(f"GPU Memory Usage: {gpu_mem / (1024 ** 2):.2f} MB\n")
         f.write(f"Total Time So Far: {total_time:.2f} seconds\n\n")
 
-# Function to log dataset info
-def log_dataset_info(dataset, filepath):
+# Function to log dataset info and weight initialization type
+def log_dataset_info(dataset, filepath, init_type):
     with open(filepath, 'a') as f:
         f.write(f"Original dataset size: {len(dataset)}\n")
         f.write(f"No augmentations applied.\n")
+        f.write(f"Model initialized with NIR channel using method: {init_type}\n")
 
 # Create a folder for the current run based on date and time
 def create_run_directory():
@@ -56,15 +57,11 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 # Get validation loader
 val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size=batch_size)
 
-# Example of creating the model with NIR initialized from the red channel
-model = MultimodalSegmentationModel(num_classes=2, nir_init_method="red").to(device)
+# Choose the weight initialization method for the NIR channel
+init_type = "random"  # Change this to "pretrained", "red" or "random" as needed
 
-# Example of creating the model with NIR initialized using pretrained weights (mean of RGB)
-#model = MultimodalSegmentationModel(num_classes=2, nir_init_method="pretrained").to(device)
-
-# Example of creating the model with NIR initialized with random weights
-#model = MultimodalSegmentationModel(num_classes=2, nir_init_method="random").to(device)
-
+# Create the model with the chosen weight initialization
+model = MultimodalSegmentationModel(num_classes=2, nir_init_method=init_type).to(device)
 
 # Set up loss function and optimizer
 learning_rate = 1e-4
@@ -74,10 +71,12 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 # Create a run directory for saving logs and model weights
 run_dir = create_run_directory()
 log_file = os.path.join(run_dir, 'training_log_multimodal.txt')
-model_weights_path = os.path.join(run_dir, 'multimodal_model_weights.pth')
 
-# Log dataset info
-log_dataset_info(train_dataset, log_file)
+# Modify the model weights path to include the initialization method in the name
+model_weights_path = os.path.join(run_dir, f'multimodal_model_weights_{init_type}.pth')
+
+# Log dataset info and initialization type
+log_dataset_info(train_dataset, log_file, init_type)
 
 # Timing and memory tracking variables
 total_start_time = time.time()
@@ -115,21 +114,18 @@ for epoch in range(num_epochs):
     # Log metrics to the file
     log_metrics(epoch+1, batch_size, learning_rate, running_loss/len(train_loader), epoch_time, gpu_mem, total_time, log_file)
 
-
-
 # Total training time
 total_training_time = time.time() - total_start_time
 print(f"Total training time: {total_training_time:.2f} seconds")
 
-
-
-# Save the final model weights
+# Save the final model weights with the initialization type in the name
 torch.save(model.state_dict(), model_weights_path)
 
-# Append final training time to the log file
+# Append final training time and initialization type to the log file
 with open(log_file, 'a') as f:
     f.write(f"Total Training Time: {total_training_time:.2f} seconds\n")
     f.write(f"Model Weights saved to {model_weights_path}\n")
+    f.write(f"Model initialized with NIR channel using method: {init_type}\n")
 
-    # After training completes, run validation
+# After training completes, run validation
 validate(model, val_loader, device)

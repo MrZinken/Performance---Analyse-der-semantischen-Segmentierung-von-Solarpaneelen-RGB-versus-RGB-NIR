@@ -38,17 +38,6 @@ def validate(model, val_loader, device):
     print(f'Average IoU: {avg_iou:.4f}')
 
 
-# Modified IoU calculation with visualization
-def calculate_iou(pred, target):
-    intersection = (pred == target).float().sum((1, 2))  # Intersection for label matching
-    union = torch.logical_or(pred, target).float().sum((1, 2))  # Union for matching areas
-    iou = (intersection + 1e-6) / (union + 1e-6)  # Add epsilon to avoid division by zero
-
-    # Visualize the intersection and union
-    visualize_iou(pred, target)
-
-    return iou.mean()
-
 # Visualize the image, prediction, target, and IoU-related areas
 def visualize(fused_image, pred, target, pred_tensor, target_tensor):
     batch_size = fused_image.shape[0]
@@ -64,7 +53,11 @@ def visualize(fused_image, pred, target, pred_tensor, target_tensor):
             rgb_image = np.transpose(rgb_image, (1, 2, 0))  # Transpose to (H, W, C)
 
             # Rescale the pixel values to the [0, 1] range for proper visualization
-            rgb_image = (rgb_image - rgb_image.min()) / (rgb_image.max() - rgb_image.min())
+            if rgb_image.max() > rgb_image.min():
+                rgb_image = (rgb_image - rgb_image.min()) / (rgb_image.max() - rgb_image.min())
+            else:
+                # If all pixel values are the same, just make it a flat gray image
+                rgb_image = np.zeros_like(rgb_image) + 0.5  # Flat gray image to avoid visualization issues
         else:
             print(f"Fused image does not have 3 channels for RGB. It has {current_image.shape[0]} channels.")
             continue  # Skip visualization if we can't extract RGB
@@ -77,17 +70,26 @@ def visualize(fused_image, pred, target, pred_tensor, target_tensor):
         plt.imshow(rgb_image)
         plt.title('Original RGB Image')
         
-        # Show predicted mask
+        # Show predicted mask in color
         plt.subplot(1, 4, 2)
-        plt.imshow(current_pred)
+        plt.imshow(current_pred, cmap='coolwarm')  # Use a color map for better visualization
         plt.title('Predicted Mask')
         
-        # Show ground truth mask
+        # Show ground truth mask in color
         plt.subplot(1, 4, 3)
-        plt.imshow(current_target)
+        plt.imshow(current_target, cmap='coolwarm')  # Use a color map for better visualization
         plt.title('Ground Truth Mask')
 
         plt.show()
+
+# Modified IoU calculation with visualization
+def calculate_iou(pred, target):
+    intersection = (pred == target).float().sum((1, 2))  # Intersection for label matching
+    union = torch.logical_or(pred, target).float().sum((1, 2))  # Union for matching areas
+    iou = (intersection + 1e-6) / (union + 1e-6)  # Add epsilon to avoid division by zero
+
+    return iou.mean()
+
 
 # Visualization for intersection and union
 def visualize_iou(pred_tensor, target_tensor):
