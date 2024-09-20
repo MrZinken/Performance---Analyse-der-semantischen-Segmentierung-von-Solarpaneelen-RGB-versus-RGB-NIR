@@ -4,24 +4,20 @@ import random
 import matplotlib.pyplot as plt
 from torchvision.transforms import ColorJitter
 from scipy.ndimage import gaussian_filter
-
+from PIL import Image
+    
 class Augmentations:
-    def __init__(self, rotate_probs, flip_probs, brightness_prob=0.5, brightness_factor=0.2,
-                 exposure_prob=0.5, exposure_factor=0.2, saturation_prob=0.5, saturation_factor=0.2,
-                 blur_prob=0.5, blur_sigma=1, visualize=False):
-        # Rotation probabilities for 90, 180, and 270 degrees
+    def __init__(self, rotate_probs, flip_probs, brightness_prob=0.5, brightness_factor=0.05,
+                 exposure_prob=0.5, exposure_factor=0.05, saturation_prob=0.5, saturation_factor=0.05,
+                 blur_prob=0.5, blur_sigma=1, visualize=True):
         self.rotate_probs = rotate_probs
-        # Flip probabilities (horizontal and vertical)
         self.flip_probs = flip_probs
-        # Brightness, exposure, saturation augmentation
         self.color_jitter = ColorJitter(brightness=brightness_factor, contrast=exposure_factor, saturation=saturation_factor)
         self.brightness_prob = brightness_prob
         self.exposure_prob = exposure_prob
         self.saturation_prob = saturation_prob
-        # Blur augmentation
         self.blur_prob = blur_prob
         self.blur_sigma = blur_sigma
-        # Visualization flag
         self.visualize = visualize
 
     def rotate(self, image, mask):
@@ -46,7 +42,9 @@ class Augmentations:
     def apply_color_jitter(self, image):
         """Apply brightness, exposure, and saturation augmentation."""
         if random.random() < self.brightness_prob:
-            image = np.array(self.color_jitter(image))
+            pil_image = Image.fromarray(np.uint8(image))  # Convert NumPy to PIL
+            pil_image = self.color_jitter(pil_image)  # Apply ColorJitter
+            image = np.array(pil_image)  # Convert back to NumPy
             return image, 'Color jitter applied'
         return image, 'No color jitter'
 
@@ -57,33 +55,29 @@ class Augmentations:
         return image, 'No blur'
 
     def augment(self, image, mask):
-        """Apply the series of augmentations."""
-        original_image, original_mask = image.copy(), mask.copy()
+        # Check strides before augmentations
+        print(f"Original image strides: {image.strides}")
 
-        # Rotation and visualize
+        # Rotate and ensure the image is contiguous
         image, mask, rotate_info = self.rotate(image, mask)
-        if self.visualize:
-            self.visualize_augmentation_step(original_image, original_mask, image, mask, f'Rotation: {rotate_info}')
-        
-        # Flip and visualize
-        original_image, original_mask = image.copy(), mask.copy()
+        print(f"Image strides after rotation: {image.strides}")
+        image = np.ascontiguousarray(image)
+
+        # Flip and ensure the image is contiguous
         image, mask, flip_info = self.flip(image, mask)
-        if self.visualize:
-            self.visualize_augmentation_step(original_image, original_mask, image, mask, f'Flip: {flip_info}')
-        
-        # Color jitter and visualize
-        original_image = image.copy()
+        print(f"Image strides after flip: {image.strides}")
+        image = np.ascontiguousarray(image)
+
+        # Apply color jitter and visualize
         image, jitter_info = self.apply_color_jitter(image)
-        if self.visualize:
-            self.visualize_augmentation_step(original_image, original_mask, image, mask, f'Color Jitter: {jitter_info}')
-        
-        # Blur and visualize
-        original_image = image.copy()
+        print(f"Image strides after color jitter: {image.strides}")
+
+        # Apply blur and visualize
         image, blur_info = self.apply_blur(image)
-        if self.visualize:
-            self.visualize_augmentation_step(original_image, original_mask, image, mask, f'Blur: {blur_info}')
+        print(f"Image strides after blur: {image.strides}")
 
         return image, mask
+
 
     def visualize_augmentation_step(self, original_image, original_mask, augmented_image, augmented_mask, augmentation_name):
         """Visualize the step of augmentation."""

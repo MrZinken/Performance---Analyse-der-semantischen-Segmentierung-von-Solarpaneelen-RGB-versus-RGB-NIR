@@ -5,10 +5,11 @@ from torch.utils.data import Dataset
 import cv2
 
 class RGBNIRDataset(Dataset):
-    def __init__(self, annotations, npy_dir, transform=None):
+    def __init__(self, annotations, npy_dir, transform=None, augmentor=None):
         self.annotations = annotations
         self.npy_dir = npy_dir
         self.transform = transform
+        self.augmentor = augmentor  # Pass the augmentation object
 
     def __len__(self):
         return len(self.annotations['images'])
@@ -29,16 +30,35 @@ class RGBNIRDataset(Dataset):
         nir_image = data[:, :, 3]   # Fourth channel is NIR
         
         # Combine into a 4-channel image (fused input)
-        fused_image = torch.cat([torch.tensor(rgb_image).permute(2, 0, 1), torch.tensor(nir_image).unsqueeze(0)], dim=0)
-        
+        fused_image = np.concatenate((rgb_image, nir_image[..., np.newaxis]), axis=2)
+
         # Get the target mask
         target = self.get_target(img_id, rgb_image.shape[:2])
+
+        # Apply augmentations (if any)
+        if self.augmentor:
+            fused_image, target = self.augmentor.augment(fused_image, target)
+
+        # Ensure the numpy array has contiguous memory to avoid negative strides for fused_image
+        fused_image = torch.tensor(np.ascontiguousarray(fused_image)).permute(2, 0, 1).float()
+
+        # Ensure the target (mask) is also contiguous in memory
+        print(f"Target strides before conversion: {target.strides}")
+        target = np.ascontiguousarray(target)
+        print(f"Target strides after making contiguous: {target.strides}")
         
-        # Apply transformations (if any)
+        # Convert to tensor
+        target = torch.tensor(target, dtype=torch.long)
+
+        # Apply any other transforms (like normalization) if provided
         if self.transform:
             fused_image = self.transform(fused_image)
 
-        return fused_image.float(), target
+        return fused_image, target
+
+
+
+
 
     def get_target(self, image_id, img_shape):
         # Retrieve annotations (masks) for the current image
@@ -50,7 +70,7 @@ class RGBNIRDataset(Dataset):
             mask = self.create_mask(ann['segmentation'], img_shape)
             masks = np.maximum(masks, mask)  # Merge all masks
         
-        return torch.tensor(masks, dtype=torch.long)  # Target should be long tensor
+        return masks
 
     def create_mask(self, segmentation, img_shape):
         # Create an empty mask

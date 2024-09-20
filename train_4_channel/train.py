@@ -1,17 +1,22 @@
+import os
+import numpy as np
 import torch
-import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import Dataset, DataLoader
+import cv2
 import json
 import time
-import os
 import psutil
 from dataset import RGBNIRDataset
+import torch.optim as optim
+from datetime import datetime
+from augmentations import Augmentations
 from model import MultimodalSegmentationModel
 from validation import validate, get_validation_loader
-from datetime import datetime
+
 
 # Set device (GPU if available, else CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 # Function to log metrics and save to a file
 def log_metrics(epoch, batch_size, learning_rate, loss, epoch_time, gpu_mem, total_time, filepath):
@@ -24,11 +29,27 @@ def log_metrics(epoch, batch_size, learning_rate, loss, epoch_time, gpu_mem, tot
         f.write(f"GPU Memory Usage: {gpu_mem / (1024 ** 2):.2f} MB\n")
         f.write(f"Total Time So Far: {total_time:.2f} seconds\n\n")
 
-# Function to log dataset info
-def log_dataset_info(dataset, filepath):
+
+# Function to log augmentation parameters and dataset info
+def log_dataset_and_augmentation_info(dataset, augmentor, model_init_method, filepath):
     with open(filepath, 'a') as f:
         f.write(f"Original dataset size: {len(dataset)}\n")
-        f.write(f"No augmentations applied.\n")
+        
+        # Log augmentation details if augmentor is used
+        if augmentor:
+            f.write(f"Augmentation applied:\n")
+            f.write(f"  Rotation probabilities: {augmentor.rotate_probs}\n")
+            f.write(f"  Flip probabilities: {augmentor.flip_probs}\n")
+            f.write(f"  Brightness probability: {augmentor.brightness_prob}, factor: {augmentor.color_jitter.brightness}\n")
+            f.write(f"  Exposure probability: {augmentor.exposure_prob}, factor: {augmentor.color_jitter.contrast}\n")
+            f.write(f"  Saturation probability: {augmentor.saturation_prob}, factor: {augmentor.color_jitter.saturation}\n")
+            f.write(f"  Blur probability: {augmentor.blur_prob}, sigma: {augmentor.blur_sigma}\n")
+        else:
+            f.write(f"No augmentations applied.\n")
+
+        # Log model initialization method (pretrained weights)
+        f.write(f"Model initialized with NIR channel using method: {model_init_method}\n")
+
 
 # Create a folder for the current run based on date and time
 def create_run_directory():
@@ -36,6 +57,35 @@ def create_run_directory():
     run_dir = os.path.join(os.getcwd(), 'runs', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
+
+
+# Toggle to turn augmentation on or off
+use_augmentation = True
+
+# Set the probabilities for augmentations
+rotate_probs = [0.25, 0.25, 0.25]  # Rotate 90, 180, 270 degrees with equal probability
+flip_probs = [0.5, 0.5]  # 50% chance for horizontal and vertical flip
+brightness_prob = 0.5
+exposure_prob = 0.5
+saturation_prob = 0.5
+blur_prob = 0.3
+blur_sigma = 1.5
+
+# Create an augmentation object if augmentation is enabled
+if use_augmentation:
+    augmentor = Augmentations(
+        rotate_probs=rotate_probs, 
+        flip_probs=flip_probs, 
+        brightness_prob=brightness_prob, 
+        exposure_prob=exposure_prob, 
+        saturation_prob=saturation_prob, 
+        blur_prob=blur_prob, 
+        blur_sigma=blur_sigma, 
+        visualize=False  # Set to True if you want to visualize augmentations
+    )
+else:
+    augmentor = None  # No augmentations if use_augmentation is False
+
 
 # Load training annotations
 with open('/home/kai/Documents/dataset_np/train/_annotations.coco.json', 'r') as f:
@@ -48,23 +98,17 @@ val_annotations_path = '/home/kai/Documents/dataset_np/valid/_annotations.coco.j
 train_npy_dir = '/home/kai/Documents/dataset_np/train'
 val_npy_dir = '/home/kai/Documents/dataset_np/valid'
 
-# Load the dataset
+# Load the dataset with or without the augmentor based on the flag
 batch_size = 4
-train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None)
+train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None, augmentor=augmentor)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
 # Get validation loader
 val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size=batch_size)
 
-# Example of creating the model with NIR initialized from the red channel
-model = MultimodalSegmentationModel(num_classes=2, nir_init_method="red").to(device)
-
-# Example of creating the model with NIR initialized using pretrained weights (mean of RGB)
-#model = MultimodalSegmentationModel(num_classes=2, nir_init_method="pretrained").to(device)
-
-# Example of creating the model with NIR initialized with random weights
-#model = MultimodalSegmentationModel(num_classes=2, nir_init_method="random").to(device)
-
+# Example of creating the model
+model_init_method = "red"  # Choose from "red", "pretrained", or "random"
+model = MultimodalSegmentationModel(num_classes=2, nir_init_method=model_init_method).to(device)
 
 # Set up loss function and optimizer
 learning_rate = 1e-4
@@ -74,10 +118,12 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 # Create a run directory for saving logs and model weights
 run_dir = create_run_directory()
 log_file = os.path.join(run_dir, 'training_log_multimodal.txt')
-model_weights_path = os.path.join(run_dir, 'multimodal_model_weights.pth')
 
-# Log dataset info
-log_dataset_info(train_dataset, log_file)
+# The model weights path includes the model initialization method for better tracking
+model_weights_path = os.path.join(run_dir, f'multimodal_model_weights_{model_init_method}.pth')
+
+# Log dataset info and augmentation parameters
+log_dataset_and_augmentation_info(train_dataset, augmentor, model_init_method, log_file)
 
 # Timing and memory tracking variables
 total_start_time = time.time()
@@ -109,19 +155,18 @@ for epoch in range(num_epochs):
     total_time = time.time() - total_start_time
     gpu_mem = torch.cuda.memory_allocated(device) if torch.cuda.is_available() else psutil.virtual_memory().used
 
+   
+
+
     # Print metrics for the epoch
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')
 
     # Log metrics to the file
     log_metrics(epoch+1, batch_size, learning_rate, running_loss/len(train_loader), epoch_time, gpu_mem, total_time, log_file)
 
-
-
 # Total training time
 total_training_time = time.time() - total_start_time
 print(f"Total training time: {total_training_time:.2f} seconds")
-
-
 
 # Save the final model weights
 torch.save(model.state_dict(), model_weights_path)
@@ -131,5 +176,5 @@ with open(log_file, 'a') as f:
     f.write(f"Total Training Time: {total_training_time:.2f} seconds\n")
     f.write(f"Model Weights saved to {model_weights_path}\n")
 
-    # After training completes, run validation
+# After training completes, run validation
 validate(model, val_loader, device)
