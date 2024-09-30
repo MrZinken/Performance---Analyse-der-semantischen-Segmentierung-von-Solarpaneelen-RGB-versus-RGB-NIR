@@ -48,16 +48,14 @@ transform = transforms.Compose([
 ])
 
 
-# Load training annotations
-with open('/home/kai/Desktop/np_dataset/train/_annotations.coco.json', 'r') as f:
+# Set the paths to the dataset
+train_npy_dir = '/home/kai/Documents/dataset/train'
+with open('/home/kai/Documents/dataset/train/_annotations.coco.json', 'r') as f:
     train_annotations = json.load(f)
 
 # Load validation annotations
-val_annotations_path = '/home/kai/Desktop/np_dataset/valid/_annotations.coco.json'
-
-# Set the paths to the dataset
-train_npy_dir = '/home/kai/Desktop/np_dataset/train'
-val_npy_dir = '/home/kai/Desktop/np_dataset/valid'
+val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
+val_npy_dir = '/home/kai/Documents/dataset/valid'
 
 # Load the dataset with the resize transformation
 batch_size = 1

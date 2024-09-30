@@ -12,8 +12,6 @@ class SwinTransformerBackbone(nn.Module):
     def forward(self, x):
         features = self.backbone(x)
         # Print the shape of each feature map
-        for idx, feature in enumerate(features):
-            print(f"Feature {idx} shape: {feature.shape}")
         return features[-1]  # Ensure this is the feature map you want to use
 
 
