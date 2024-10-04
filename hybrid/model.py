@@ -46,8 +46,7 @@ class SegmentationHead(nn.Module):
         return x
 
 
-
-
+# Hybrid Multimodal Segmentation Model
 class HybridSegmentationModel(nn.Module):
     def __init__(self, num_classes=2, cnn_input_channels=4, swin_input_channels=4, backbone_name='swin_base_patch4_window7_224', pretrained=True):
         super(HybridSegmentationModel, self).__init__()
@@ -62,18 +61,15 @@ class HybridSegmentationModel(nn.Module):
     def forward(self, x):
         # Pass the input through both the CNN and Swin Transformer backbones
         cnn_features = self.cnn_backbone(x)  # Output: [batch_size, 256, h/4, w/4]
-        swin_features = self.swin_backbone(x)  # Output: [batch_size, swin_feature_channels, different spatial size]
+        swin_features = self.swin_backbone(x)  # Output: [batch_size, swin_feature_channels, h/4, w/4]
 
-        # Ensure swin_features are in the correct format
+        # Ensure Swin Transformer features are in the same format
         if swin_features.dim() == 3:
             swin_features = swin_features.unsqueeze(0)  # Add batch dimension
         swin_features = swin_features.permute(0, 3, 1, 2)  # [batch_size, height, width, channels] -> [batch_size, channels, height, width]
 
-        # Resize swin_features to match the spatial size of cnn_features
-        swin_features_resized = F.interpolate(swin_features, size=(cnn_features.shape[2], cnn_features.shape[3]), mode='bilinear', align_corners=False)
-
         # Concatenate CNN and Swin Transformer features along the channel dimension
-        combined_features = torch.cat([cnn_features, swin_features_resized], dim=1)  # Concatenate along the channel axis
+        combined_features = torch.cat([cnn_features, swin_features], dim=1)  # Concatenate along the channel axis
 
         # Pass the combined features through the segmentation head
         output = self.segmentation_head(combined_features)
