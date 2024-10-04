@@ -13,13 +13,13 @@ from validation import validate  # Import the new validation function
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Paths to the dataset and annotation files
-train_npy_dir = '/home/kai/Desktop/dataset/train'
-val_npy_dir = '/home/kai/Desktop/dataset/valid'
-train_annotations_path = '/home/kai/Desktop/dataset/train/_annotations.coco.json'
-val_annotations_path = '/home/kai/Desktop/dataset/valid/_annotations.coco.json'
+train_npy_dir = '/home/kai/Documents/dataset/train'
+val_npy_dir = '/home/kai/Documents/dataset/valid'
+train_annotations_path = '/home/kai/Documents/dataset/train/_annotations.coco.json'
+val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
 
 # Hyperparameters
-num_epochs = 2
+num_epochs = 4
 batch_size = 4
 learning_rate = 1e-4
 num_classes = 2

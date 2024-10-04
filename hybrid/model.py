@@ -68,6 +68,9 @@ class HybridSegmentationModel(nn.Module):
             swin_features = swin_features.unsqueeze(0)  # Add batch dimension
         swin_features = swin_features.permute(0, 3, 1, 2)  # [batch_size, height, width, channels] -> [batch_size, channels, height, width]
 
+        # Align the feature map sizes by interpolating the smaller one (usually CNN features)
+        cnn_features = F.interpolate(cnn_features, size=(swin_features.shape[2], swin_features.shape[3]), mode='bilinear', align_corners=False)
+
         # Concatenate CNN and Swin Transformer features along the channel dimension
         combined_features = torch.cat([cnn_features, swin_features], dim=1)  # Concatenate along the channel axis
 

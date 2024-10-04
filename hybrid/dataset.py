@@ -28,10 +28,10 @@ class RGBNIRDataset(Dataset):
         image_info = self.annotations['images'][idx]
         img_name = image_info['file_name']
         img_id = image_info['id']
-        npy_name = f"{os.path.splitext(img_name)[0]}_rgb_ir.npy"
+        
         
         # Load the NumPy file (assuming 4 channels: RGB + NIR)
-        npy_path = os.path.join(self.npy_dir, npy_name)
+        npy_path = os.path.join(self.npy_dir, img_name)
         data = np.load(npy_path)
         
         # Split the RGB and NIR channels
