@@ -39,15 +39,13 @@ def create_run_directory():
     return run_dir
 
 # Load training annotations
-with open('/home/kai/Documents/dataset_np/train/_annotations.coco.json', 'r') as f:
+with open('/home/kai/Documents/augmented/_annotations.coco.json', 'r') as f:
     train_annotations = json.load(f)
+train_npy_dir = '/home/kai/Documents/augmented'
 
 # Load validation annotations
-val_annotations_path = '/home/kai/Documents/dataset_np/valid/_annotations.coco.json'
-
-# Set the paths to the dataset
-train_npy_dir = '/home/kai/Documents/dataset_np/train'
-val_npy_dir = '/home/kai/Documents/dataset_np/valid'
+val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
+val_npy_dir = '/home/kai/Documents/dataset/valid'
 
 # Load the dataset
 batch_size = 4
@@ -83,7 +81,7 @@ total_start_time = time.time()
 total_gpu_mem_usage = 0
 
 # Training loop
-num_epochs = 25
+num_epochs = 10
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0

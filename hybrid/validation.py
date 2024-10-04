@@ -4,6 +4,7 @@ import json
 from dataset import RGBNIRDataset
 import matplotlib.pyplot as plt
 import numpy as np
+import torch.nn.functional as F
 
 # Load validation annotations
 def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
@@ -28,9 +29,12 @@ def validate(model, val_loader, device):
             output = model(fused_image)
             pred = torch.argmax(output, dim=1)
 
+            # Resize target to match the output size (224x224)
+            target_resized = F.interpolate(target.unsqueeze(1).float(), size=(224, 224), mode='nearest').squeeze(1).long()
+
             # Calculate IoU, Precision, Recall, F1 Score
-            iou = calculate_iou(pred, target)
-            precision, recall, f1_score = calculate_metrics(pred, target)
+            iou = calculate_iou(pred, target_resized)
+            precision, recall, f1_score = calculate_metrics(pred, target_resized)
 
             ious.append(iou.cpu().numpy())
             precisions.append(precision.cpu().numpy())
@@ -38,7 +42,7 @@ def validate(model, val_loader, device):
             f1s.append(f1_score.cpu().numpy())
 
             # Visualize original image, prediction, and IoU visualization
-            visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy(), pred, target)
+            visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy(), pred, target_resized)
     
     # Compute the average of each metric
     avg_iou = np.mean(ious)
@@ -126,27 +130,3 @@ def visualize(fused_image, pred, target, pred_tensor, target_tensor):
         plt.title('Ground Truth Mask')
 
         plt.show()
-
-
-# Visualization for intersection and union (optional)
-def visualize_iou(pred_tensor, target_tensor):
-    intersection = (pred_tensor == target_tensor).float()  # Pixels that match between pred and target
-    union = torch.logical_or(pred_tensor, target_tensor).float()  # All relevant pixels in pred or target
-
-    # Convert to numpy for visualization
-    intersection = intersection.cpu().numpy()
-    union = union.cpu().numpy()
-
-    plt.figure(figsize=(10, 4))
-
-    # Visualize the intersection
-    plt.subplot(1, 2, 1)
-    plt.imshow(intersection[0], cmap='gray')
-    plt.title("Intersection")
-
-    # Visualize the union
-    plt.subplot(1, 2, 2)
-    plt.imshow(union[0], cmap='gray')
-    plt.title("Union")
-
-    plt.show()

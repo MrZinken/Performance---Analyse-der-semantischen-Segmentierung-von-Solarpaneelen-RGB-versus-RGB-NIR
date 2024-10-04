@@ -4,29 +4,34 @@ import torch
 from torch.utils.data import Dataset
 import cv2
 
+import json
+
 class RGBNIRDataset(Dataset):
     def __init__(self, annotations, npy_dir, transform=None):
-        self.annotations = annotations
+        # Ensure annotations is a dictionary
+        if isinstance(annotations, str):  # If it's a string, treat it as a file path
+            with open(annotations, 'r') as f:
+                self.annotations = json.load(f)
+        else:  # Otherwise, assume it's already a dictionary
+            self.annotations = annotations
+
         self.npy_dir = npy_dir
         self.transform = transform
 
     def __len__(self):
         return len(self.annotations['images'])
 
+
+
     def __getitem__(self, idx):
         # Extract image information
         image_info = self.annotations['images'][idx]
-        img_name = image_info['file_name']  # Directly use the name from the annotation file
+        img_name = image_info['file_name']
         img_id = image_info['id']
-        
-        # Load the NumPy file with the exact name from the annotation file
-        npy_path = os.path.join(self.npy_dir, img_name)
-        
-        # Check if the NumPy file exists
-        if not os.path.exists(npy_path):
-            raise FileNotFoundError(f"NumPy file {npy_path} not found.")
+        npy_name = f"{os.path.splitext(img_name)[0]}_rgb_ir.npy"
         
         # Load the NumPy file (assuming 4 channels: RGB + NIR)
+        npy_path = os.path.join(self.npy_dir, npy_name)
         data = np.load(npy_path)
         
         # Split the RGB and NIR channels
@@ -36,14 +41,19 @@ class RGBNIRDataset(Dataset):
         # Combine into a 4-channel image (fused input)
         fused_image = torch.cat([torch.tensor(rgb_image).permute(2, 0, 1), torch.tensor(nir_image).unsqueeze(0)], dim=0)
         
+        # Convert the fused image to float and scale to [0, 1]
+        fused_image = fused_image.float() / 255.0
+        
         # Get the target mask
         target = self.get_target(img_id, rgb_image.shape[:2])
         
-        # Apply transformations (if any)
+        # Apply transformations (if any), but skip ToTensor as it's already a tensor
         if self.transform:
-            fused_image = self.transform(fused_image)
+            fused_image = self.transform(fused_image)  # This should handle resizing, normalization, etc.
 
-        return fused_image.float(), target
+        return fused_image, target
+
+
 
     def get_target(self, image_id, img_shape):
         # Retrieve annotations (masks) for the current image
@@ -64,3 +74,5 @@ class RGBNIRDataset(Dataset):
             polygon = np.array(segment).reshape(-1, 2)
             mask = cv2.fillPoly(mask, [polygon.astype(np.int32)], 1)
         return mask
+    
+    
