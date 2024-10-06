@@ -18,10 +18,10 @@ class RGBDataset(Dataset):
         image_info = self.annotations['images'][idx]
         img_name = image_info['file_name']
         img_id = image_info['id']
-        npy_name = f"{os.path.splitext(img_name)[0]}_rgb_ir.npy"  # Still loading from 4-channel file
+        
         
         # Load the NumPy file and extract only the RGB channels
-        npy_path = os.path.join(self.npy_dir, npy_name)
+        npy_path = os.path.join(self.npy_dir, img_name)
         data = np.load(npy_path)
         rgb_image = data[:, :, :3]  # Use only the first 3 channels (RGB)
         
