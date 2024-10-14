@@ -33,7 +33,7 @@ def analyze_tiff_bit_depth(tiff_image_path):
     print(f"NIR-Kanal Min: {nir_channel.min()}, Max: {nir_channel.max()}")
 
 # Pfad zur TIFF-Datei
-tiff_image_path = '/media/kai/data/4channel_old/Testdaten_Kai_Mai/67502375.tif'
+tiff_image_path = '/home/kai/Documents/2slice/62752400.tif'
 
 # Bild analysieren
 analyze_tiff_bit_depth(tiff_image_path)

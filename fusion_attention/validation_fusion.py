@@ -1,9 +1,10 @@
 import torch
 from torch.utils.data import DataLoader
 import json
-from dataset import RGBNIRDataset
+from dataset_loader_fusion import RGBNIRDataset
 import matplotlib.pyplot as plt
 import numpy as np
+import torch.nn.functional as F
 
 # Load validation annotations
 def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
@@ -15,11 +16,12 @@ def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
     
     return val_loader
 
-# Validation function with IoU, Precision, Recall, and F1 Score
-def validate(model, val_loader, device):
+def validate(model, val_loader, device, visualize_results=False):
     model.eval()
     ious, precisions, recalls, f1s = [], [], [], []
-    
+    total_loss = 0.0
+    criterion = torch.nn.CrossEntropyLoss()
+
     with torch.no_grad():
         for fused_image, target in val_loader:
             fused_image = fused_image.to(device)
@@ -37,8 +39,14 @@ def validate(model, val_loader, device):
             recalls.append(recall.cpu().numpy())
             f1s.append(f1_score.cpu().numpy())
 
-            # Visualize original image, prediction, and IoU visualization
-            visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy(), pred, target)
+            # Calculate and accumulate validation loss
+            target_resized = F.interpolate(target.unsqueeze(1).float(), size=output.shape[2:], mode='nearest').squeeze(1).long()
+            loss = criterion(output, target_resized)
+            total_loss += loss.item()
+
+            # Conditionally visualize results
+            if visualize_results:
+                visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy(), pred, target)
     
     # Compute the average of each metric
     avg_iou = np.mean(ious)
@@ -46,10 +54,18 @@ def validate(model, val_loader, device):
     avg_recall = np.mean(recalls)
     avg_f1 = np.mean(f1s)
 
+    # Calculate average loss
+    avg_loss = total_loss / len(val_loader)
+
     print(f'Average IoU: {avg_iou:.4f}')
     print(f'Average Precision: {avg_precision:.4f}')
     print(f'Average Recall: {avg_recall:.4f}')
     print(f'Average F1 Score: {avg_f1:.4f}')
+    print(f'Average Validation Loss: {avg_loss:.4f}')
+
+    return avg_loss
+
+
 
 
 # Calculate precision, recall, and F1 score

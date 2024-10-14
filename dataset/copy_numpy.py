@@ -37,16 +37,21 @@ def copy_and_rename_files_for_datasets(dataset_folder, slices_folder):
     # Define the paths for the training and validation annotation files
     training_annotation_file = os.path.join(dataset_folder, 'train', '_annotations.coco.json')
     validation_annotation_file = os.path.join(dataset_folder, 'valid', '_annotations.coco.json')
+    test_annotation_file = os.path.join(dataset_folder, 'test', '_annotations.coco.json')
 
     # Define the target directories
     training_target_directory = os.path.join(dataset_folder, 'train')
     validation_target_directory = os.path.join(dataset_folder, 'valid')
+    test_target_directory = os.path.join(dataset_folder, 'test')
 
     print("\nCopying and renaming files for the training dataset...")
     find_and_copy_and_rename_numpy_arrays(training_annotation_file, slices_folder, training_target_directory)
 
     print("\nCopying and renaming files for the validation dataset...")
     find_and_copy_and_rename_numpy_arrays(validation_annotation_file, slices_folder, validation_target_directory)
+
+    print("\nCopying and renaming files for the validation dataset...")
+    find_and_copy_and_rename_numpy_arrays(test_annotation_file, slices_folder, test_target_directory)
 
 # Example usage
 dataset_folder = '/home/kai/Documents/dataset'  # Path to the dataset folder containing 'train' and 'valid'

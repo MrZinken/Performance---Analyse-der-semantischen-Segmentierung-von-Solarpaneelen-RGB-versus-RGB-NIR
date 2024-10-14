@@ -66,6 +66,6 @@ def process_all_tiffs_in_folder(input_folder, output_dir, slice_size=1000, max_s
             slice_image_and_save(input_image_path, output_dir, slice_size=slice_size, max_slices=max_slices)
 
 # Example usage
-input_folder = '/media/kai/data/2slice'
-output_dir = '/media/kai/data/2annotate'
+input_folder = '/home/kai/Documents/2slice'
+output_dir = '/home/kai/Documents/2slice/out'
 process_all_tiffs_in_folder(input_folder, output_dir, slice_size=1000)
