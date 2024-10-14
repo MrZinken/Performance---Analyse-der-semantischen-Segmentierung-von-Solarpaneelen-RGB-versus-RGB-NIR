@@ -1,6 +1,5 @@
 import torch
 import json
-import os
 from torch.utils.data import DataLoader
 from train_4_channel.model_4_channel import MultimodalSegmentationModel  # Import your model
 from dataset import RGBNIRDataset  # Import your dataset class

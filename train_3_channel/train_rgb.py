@@ -50,7 +50,7 @@ train_npy_dir = '/home/kai/Documents/dataset/train'
 val_npy_dir = '/home/kai/Documents/dataset/valid'
 
 # Load the dataset
-batch_size = 4
+batch_size = 3
 train_dataset = RGBDataset(train_annotations, train_npy_dir, transform=None)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 

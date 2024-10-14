@@ -1,0 +1,10 @@
+Training Parameters:
+Model Name: MultimodalSegmentationModel
+Number of Training Images: 300
+Batch Size: 3
+Learning Rate: 1e-05
+Total Epochs: 100
+Patience: 5
+
+Epoch Details:
+Epoch, Loss, Validation Loss, Time (s), GPU Memory (MB)

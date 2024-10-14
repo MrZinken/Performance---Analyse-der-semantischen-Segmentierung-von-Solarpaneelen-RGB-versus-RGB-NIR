@@ -4,9 +4,9 @@ from torch.utils.data import DataLoader
 import json
 import time
 import os
-from dataset import RGBNIRDataset
+from dataset_loader_fusion import RGBNIRDataset
 from model_fusion import MultimodalSegmentationModel
-from fusion_attention.validation_fusion import validate, get_validation_loader
+from validation_fusion import validate, get_validation_loader
 from datetime import datetime
 import torch.nn.functional as F
 
@@ -33,7 +33,7 @@ val_npy_dir = '/home/kai/Documents/dataset/valid'
 
 # Create DataLoader for training and validation
 batch_size = 3
-num_epochs = 40
+num_epochs = 100
 train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size=batch_size)
@@ -46,7 +46,7 @@ model_name = model.__class__.__name__
 num_train_images = len(train_dataset)
 
 # Set up optimizer and loss function
-learning_rate = 1e-4
+learning_rate = 1e-5
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 criterion = torch.nn.CrossEntropyLoss()
 

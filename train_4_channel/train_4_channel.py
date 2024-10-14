@@ -49,7 +49,7 @@ val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json
 val_npy_dir = '/home/kai/Documents/dataset/valid'
 
 # Load the dataset
-batch_size = 4
+batch_size = 3
 train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
