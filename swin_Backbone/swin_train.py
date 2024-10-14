@@ -88,7 +88,7 @@ log_dataset_info(train_dataset, log_file)
 total_start_time = time.time()
 
 # Training loop
-num_epochs = 2
+num_epochs = 10
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
@@ -124,8 +124,7 @@ for epoch in range(num_epochs):
     # Log metrics to the file
     log_metrics(epoch+1, batch_size, learning_rate, running_loss/len(train_loader), epoch_time, gpu_mem, total_time, log_file)
 
-    # Run validation after each epoch
-    validate(model, val_loader, device)
+
 
 # Total training time
 total_training_time = time.time() - total_start_time
@@ -138,3 +137,6 @@ torch.save(model.state_dict(), model_weights_path)
 with open(log_file, 'a') as f:
     f.write(f"Total Training Time: {total_training_time:.2f} seconds\n")
     f.write(f"Model Weights saved to {model_weights_path}\n")
+
+# Run validation after each epoch
+validate(model, val_loader, device)

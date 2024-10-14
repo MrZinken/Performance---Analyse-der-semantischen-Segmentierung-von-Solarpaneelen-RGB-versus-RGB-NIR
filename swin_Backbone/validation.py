@@ -18,7 +18,8 @@ def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
 # Validation function
 def validate(model, val_loader, device):
     model.eval()
-    ious = []
+    ious, precisions, recalls, f1s = [], [], [], []
+
     with torch.no_grad():
         for fused_image, target in val_loader:
             fused_image = fused_image.to(device)
@@ -30,61 +31,85 @@ def validate(model, val_loader, device):
             output = model(fused_image)
             pred = torch.argmax(output, dim=1)
 
-            # Calculate IoU
+            # Calculate metrics
             iou = calculate_iou(pred, target_resized)
-            ious.append(iou.cpu())  # Move IoU to CPU before appending
+            precision, recall, f1_score = calculate_metrics(pred, target_resized)
 
-            # Visualize original image and prediction
+            # Append metrics to lists
+            ious.append(iou.cpu().numpy())
+            precisions.append(precision.cpu().numpy())
+            recalls.append(recall.cpu().numpy())
+            f1s.append(f1_score.cpu().numpy())
+
+            # Visualize the results
             visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy())
-    
-    avg_iou = np.mean([iou.numpy() for iou in ious])  # Convert to NumPy before computing mean
-    print(f'Average IoU: {avg_iou:.4f}')
 
+    # Compute the average of each metric
+    avg_iou = np.mean(ious)
+    avg_precision = np.mean(precisions)
+    avg_recall = np.mean(recalls)
+    avg_f1 = np.mean(f1s)
+
+    print(f'Average IoU: {avg_iou:.4f}')
+    print(f'Average Precision: {avg_precision:.4f}')
+    print(f'Average Recall: {avg_recall:.4f}')
+    print(f'Average F1 Score: {avg_f1:.4f}')
+
+# Calculate Precision, Recall, and F1 Score
+def calculate_metrics(pred, target):
+    tp = ((pred == 1) & (target == 1)).float().sum((1, 2))
+    fp = ((pred == 1) & (target == 0)).float().sum((1, 2))
+    fn = ((pred == 0) & (target == 1)).float().sum((1, 2))
+    
+    precision = tp / (tp + fp + 1e-6)
+    recall = tp / (tp + fn + 1e-6)
+    f1_score = torch.where(
+        (precision + recall) > 0,
+        2 * (precision * recall) / (precision + recall + 1e-6),
+        torch.tensor(0.0)
+    )
+    
+    return precision.mean(), recall.mean(), f1_score.mean()
+
+# Improved IoU calculation (Intersection over Union) for binary masks
 def calculate_iou(pred, target):
-    intersection = (pred & target).float().sum((1, 2))  # Sum of the intersection
-    union = (pred | target).float().sum((1, 2))  # Sum of the union
-    iou = (intersection + 1e-6) / (union + 1e-6)  # Add epsilon to avoid division by zero
+    pred = pred == 1
+    target = target == 1
+    
+    intersection = (pred & target).float().sum((1, 2))
+    union = (pred | target).float().sum((1, 2))
+    iou = torch.where(union > 0, (intersection + 1e-6) / (union + 1e-6), torch.tensor(0.0))
+    
     return iou.mean()
 
+# Visualize the image, prediction, and target
 def visualize(fused_image, pred, target):
-    # fused_image is in the shape [batch_size, 4, H, W] (batch of images with 4 channels: RGB + NIR)
-    batch_size = fused_image.shape[0]  # Get the batch size
-    print(f"Fused image shape: {fused_image.shape}")  # For debugging
+    batch_size = fused_image.shape[0]
 
-    # Iterate over each image in the batch
     for i in range(batch_size):
-        current_image = fused_image[i]  # Extract the i-th image from the batch
+        current_image = fused_image[i]
         current_pred = pred[i]
         current_target = target[i]
 
-        # Check if the image has at least 3 channels for RGB visualization
         if current_image.shape[0] >= 3:
-            rgb_image = current_image[:3, :, :]  # Extract first 3 channels (RGB)
-            rgb_image = np.transpose(rgb_image, (1, 2, 0))  # Transpose to (H, W, C)
-
-            # Rescale the pixel values to the [0, 1] range for proper visualization
+            rgb_image = current_image[:3, :, :]
+            rgb_image = np.transpose(rgb_image, (1, 2, 0))
             rgb_image = (rgb_image - rgb_image.min()) / (rgb_image.max() - rgb_image.min())
-            print(f"RGB image shape: {rgb_image.shape}")
         else:
-            print(f"Fused image does not have 3 channels for RGB. It has {current_image.shape[0]} channels.")
-            continue  # Skip visualization if we can't extract RGB
+            continue
 
-        # Visualize the image, prediction, and target side by side
         plt.figure(figsize=(12, 4))
-        
-        # Show RGB image
+
         plt.subplot(1, 3, 1)
         plt.imshow(rgb_image)
         plt.title('Original RGB Image')
-        
-        # Show predicted mask
+
         plt.subplot(1, 3, 2)
-        plt.imshow(current_pred)
+        plt.imshow(current_pred, cmap='coolwarm')
         plt.title('Predicted Mask')
-        
-        # Show ground truth mask
+
         plt.subplot(1, 3, 3)
-        plt.imshow(current_target)
+        plt.imshow(current_target, cmap='coolwarm')
         plt.title('Ground Truth Mask')
-        
+
         plt.show()

@@ -60,7 +60,7 @@ val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size
 model = RGBSegmentationModel(num_classes=2).to(device)
 
 # Set up loss function and optimizer
-learning_rate = 1e-4
+learning_rate = 1e-5
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -79,7 +79,7 @@ total_start_time = time.time()
 total_gpu_mem_usage = 0
 
 # Training loop
-num_epochs = 5
+num_epochs = 40
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0

@@ -30,7 +30,8 @@ def validate(model, val_loader, device):
             pred = torch.argmax(output, dim=1)
 
             # Resize target to match the output size (224x224)
-            target_resized = F.interpolate(target.unsqueeze(1).float(), size=(224, 224), mode='nearest').squeeze(1).long()
+            target_resized = F.interpolate(target.unsqueeze(1).float(), size=(1000, 1000), mode='nearest').squeeze(1).long()
+
 
             # Calculate IoU, Precision, Recall, F1 Score
             iou = calculate_iou(pred, target_resized)
@@ -78,12 +79,15 @@ def calculate_metrics(pred, target):
     
     return precision.mean(), recall.mean(), f1_score.mean()
 
-# IoU calculation (Intersection over Union)
+# Improved IoU calculation (Intersection over Union) for binary masks
 def calculate_iou(pred, target):
-    intersection = (pred == target).float().sum((1, 2))  # Intersection for label matching
-    union = torch.logical_or(pred, target).float().sum((1, 2))  # Union for matching areas
-    iou = (intersection + 1e-6) / (union + 1e-6)  # Add epsilon to avoid division by zero
-
+    pred = pred == 1
+    target = target == 1
+    
+    intersection = (pred & target).float().sum((1, 2))
+    union = (pred | target).float().sum((1, 2))
+    iou = torch.where(union > 0, (intersection + 1e-6) / (union + 1e-6), torch.tensor(0.0))
+    
     return iou.mean()
 
 

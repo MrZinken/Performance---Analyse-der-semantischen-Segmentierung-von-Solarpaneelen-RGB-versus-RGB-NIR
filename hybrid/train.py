@@ -19,8 +19,8 @@ train_annotations_path = '/home/kai/Documents/dataset/train/_annotations.coco.js
 val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
 
 # Hyperparameters
-num_epochs = 4
-batch_size = 4
+num_epochs = 10
+batch_size = 2
 learning_rate = 1e-4
 num_classes = 2
 
@@ -34,7 +34,6 @@ from torchvision import transforms
 
 # Define transformations to resize and normalize images
 transform = transforms.Compose([
-    transforms.Resize((224, 224)),  # Resize all images to 224x224
     transforms.Normalize(mean=[0.485, 0.456, 0.406, 0.5], std=[0.229, 0.224, 0.225, 0.5])  # Normalize for 4 channels
 ])
 
@@ -54,7 +53,6 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 run_dir = 'runs/hybrid_model'
 os.makedirs(run_dir, exist_ok=True)
 
-# Training loop
 def train_model():
     total_start_time = time.time()
     
@@ -69,13 +67,13 @@ def train_model():
             optimizer.zero_grad()
 
             # Forward pass
-            output = model(fused_image)
+            output = model(fused_image)  # output is expected to be [batch_size, num_classes, 1000, 1000]
 
-            # Resize target to match the output size (224x224)
-            target_resized = F.interpolate(target.unsqueeze(1).float(), size=(224, 224), mode='nearest').squeeze(1).long()
-
+            # Ensure target is also of size [batch_size, 1000, 1000] for CrossEntropyLoss
+            # Here, we assume the target is already at the correct size and skip resizing
+            
             # Compute loss
-            loss = criterion(output, target_resized)
+            loss = criterion(output, target)
             loss.backward()
             optimizer.step()
 
@@ -85,9 +83,6 @@ def train_model():
         epoch_time = time.time() - start_time
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Time: {epoch_time:.2f}s')
 
-        # Validate the model after every epoch
-        validate_model()
-
     total_training_time = time.time() - total_start_time
     print(f"Training completed in {total_training_time:.2f} seconds")
 
@@ -95,6 +90,9 @@ def train_model():
     model_weights_path = os.path.join(run_dir, 'hybrid_model_final.pth')
     torch.save(model.state_dict(), model_weights_path)
     print(f"Model weights saved at {model_weights_path}")
+
+    # Validate the model after every epoch
+    validate_model()
 
 
 # Validation function integrated with IoU, Precision, Recall, and F1 Score

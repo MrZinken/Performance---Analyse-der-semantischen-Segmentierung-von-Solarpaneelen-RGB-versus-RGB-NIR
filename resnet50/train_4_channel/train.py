@@ -56,13 +56,13 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size=batch_size)
 
 # Choose the weight initialization method for the NIR channel
-init_type = "random"  # Change this to "pretrained", "red" or "random" as needed
+init_type = "red"  # Change this to "pretrained", "red" or "random" as needed
 
 # Create the model with the chosen weight initialization
 model = MultimodalSegmentationModel(num_classes=2, nir_init_method=init_type).to(device)
 
 # Set up loss function and optimizer
-learning_rate = 1e-4
+learning_rate = 1e-5
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -81,7 +81,7 @@ total_start_time = time.time()
 total_gpu_mem_usage = 0
 
 # Training loop
-num_epochs = 10
+num_epochs = 40
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
