@@ -18,8 +18,8 @@ def load_trained_model(model_path, num_classes=2):
     return model
 
 # Load validation annotations
-val_annotations_path = '/home/kai/Documents/dataset_np/valid/_annotations.coco.json'  # Replace with your path
-val_npy_dir = '/home/kai/Documents/dataset_np/valid'  # Replace with your path
+val_annotations_path = '/home/kai/Documents/dataset/test/_annotations.coco.json'  # Replace with your path
+val_npy_dir = '/home/kai/Documents/dataset/test'  # Replace with your path
 
 # Load the validation annotations
 with open(val_annotations_path, 'r') as f:
@@ -31,11 +31,11 @@ val_dataset = RGBDataset(val_annotations, val_npy_dir, transform=None)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Path to your trained RGB model weights
-trained_model_path = 'runs/2024-09-19_22-12-16/model_weights_2024-09-19_22-12-16.pth'  # Replace with your path
+trained_model_path = 'runs/3_channel/2024-10-14_15-20-10/best_model_weights.pth'  # Replace with your path
 
 # Load the trained model
 model = load_trained_model(trained_model_path)
 
 # Run the validation script
 print("Running validation on RGB images...")
-validate(model, val_loader, device)
+validate(model, val_loader, device, visualize_results=True)

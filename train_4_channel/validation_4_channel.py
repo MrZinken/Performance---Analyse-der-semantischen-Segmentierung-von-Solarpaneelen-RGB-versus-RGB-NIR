@@ -15,11 +15,12 @@ def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
     
     return val_loader
 
-# Validation function with IoU, Precision, Recall, and F1 Score
-def validate(model, val_loader, device):
+def validate(model, val_loader, device, visualize_results=False):
     model.eval()
     ious, precisions, recalls, f1s = [], [], [], []
-    
+    total_loss = 0.0
+    criterion = torch.nn.CrossEntropyLoss()
+
     with torch.no_grad():
         for fused_image, target in val_loader:
             fused_image = fused_image.to(device)
@@ -37,19 +38,30 @@ def validate(model, val_loader, device):
             recalls.append(recall.cpu().numpy())
             f1s.append(f1_score.cpu().numpy())
 
-            # Visualize original image, prediction, and IoU visualization
-            visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy(), pred, target)
-    
-    # Compute the average of each metric
+            # Calculate and accumulate validation loss
+            loss = criterion(output, target)
+            total_loss += loss.item()
+
+            # Optionally visualize results
+            if visualize_results:
+                visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy())
+
+    # Compute the average metrics
     avg_iou = np.mean(ious)
     avg_precision = np.mean(precisions)
     avg_recall = np.mean(recalls)
     avg_f1 = np.mean(f1s)
 
+    # Calculate average loss
+    avg_loss = total_loss / len(val_loader)
+
     print(f'Average IoU: {avg_iou:.4f}')
     print(f'Average Precision: {avg_precision:.4f}')
     print(f'Average Recall: {avg_recall:.4f}')
     print(f'Average F1 Score: {avg_f1:.4f}')
+    print(f'Average Validation Loss: {avg_loss:.4f}')
+
+    return avg_loss
 
 
 # Calculate precision, recall, and F1 score
@@ -91,8 +103,8 @@ def calculate_iou(pred, target):
 
 
 
-# Visualize the image, prediction, target, and IoU-related areas
-def visualize(fused_image, pred, target, pred_tensor, target_tensor):
+# Visualize the image, prediction, and target
+def visualize(fused_image, pred, target):
     batch_size = fused_image.shape[0]
 
     for i in range(batch_size):

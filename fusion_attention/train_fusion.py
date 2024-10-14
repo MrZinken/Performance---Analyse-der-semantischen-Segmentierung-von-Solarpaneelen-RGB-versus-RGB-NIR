@@ -16,7 +16,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Function to create a directory for saving logs and model weights
 def create_run_directory():
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', 'fusion', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 

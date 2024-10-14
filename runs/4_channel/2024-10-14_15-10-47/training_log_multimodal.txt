@@ -1,0 +1,3 @@
+Original dataset size: 300
+No augmentations applied.
+Model initialized with NIR channel using method: red

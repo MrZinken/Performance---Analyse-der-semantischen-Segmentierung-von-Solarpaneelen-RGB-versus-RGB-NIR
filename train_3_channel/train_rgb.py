@@ -14,12 +14,13 @@ from datetime import datetime
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Function to log metrics and save to a file
-def log_metrics(epoch, batch_size, learning_rate, loss, epoch_time, gpu_mem, total_time, filepath):
+def log_metrics(epoch, batch_size, learning_rate, loss, val_loss, epoch_time, gpu_mem, total_time, filepath):
     with open(filepath, 'a') as f:
         f.write(f"Epoch {epoch}:\n")
         f.write(f"Batch Size: {batch_size}\n")
         f.write(f"Learning Rate: {learning_rate}\n")
         f.write(f"Loss: {loss:.4f}\n")
+        f.write(f"Validation Loss: {val_loss:.4f}\n")
         f.write(f"Time Taken for Epoch: {epoch_time:.2f} seconds\n")
         f.write(f"GPU Memory Usage: {gpu_mem / (1024 ** 2):.2f} MB\n")
         f.write(f"Total Time So Far: {total_time:.2f} seconds\n\n")
@@ -33,7 +34,7 @@ def log_dataset_info(dataset, filepath):
 # Create a folder for the current run based on date and time
 def create_run_directory():
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', '3_channel', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 
@@ -66,17 +67,21 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 # Create a run directory for saving logs and model weights
 run_dir = create_run_directory()
-log_file = os.path.join(run_dir, 'training_log_multimodal.txt')
+log_file = os.path.join(run_dir, 'training_log_rgb.txt')
 
-# The model weights will be saved with a dynamic name based on the timestamp
-model_weights_path = os.path.join(run_dir, f'model_weights_{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.pth')
+# Best model saving path
+best_model_weights_path = os.path.join(run_dir, 'best_model_weights.pth')
 
 # Log dataset info
 log_dataset_info(train_dataset, log_file)
 
+# Early stopping parameters
+patience = 5
+best_val_loss = float('inf')
+epochs_no_improve = 0
+
 # Timing and memory tracking variables
 total_start_time = time.time()
-total_gpu_mem_usage = 0
 
 # Training loop
 num_epochs = 40
@@ -99,28 +104,44 @@ for epoch in range(num_epochs):
 
         running_loss += loss.item()
 
-    # Calculate time and memory usage
+    # Calculate average training loss for this epoch
+    avg_loss = running_loss / len(train_loader)
     epoch_time = time.time() - start_time
     total_time = time.time() - total_start_time
     gpu_mem = torch.cuda.memory_allocated(device) if torch.cuda.is_available() else psutil.virtual_memory().used
 
+    # Run validation and calculate validation loss
+    val_loss = validate(model, val_loader, device, visualize_results=False)
+
     # Print metrics for the epoch
-    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {running_loss/len(train_loader):.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')
+    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')
 
     # Log metrics to the file
-    log_metrics(epoch+1, batch_size, learning_rate, running_loss/len(train_loader), epoch_time, gpu_mem, total_time, log_file)
+    log_metrics(epoch+1, batch_size, learning_rate, avg_loss, val_loss, epoch_time, gpu_mem, total_time, log_file)
+
+    # Early stopping logic and save the best model
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        epochs_no_improve = 0
+        torch.save(model.state_dict(), best_model_weights_path)
+        print(f"Saving best model with validation loss: {best_val_loss:.4f}")
+    else:
+        epochs_no_improve += 1
+        print(f"Validation loss did not improve. Patience: {epochs_no_improve}/{patience}")
+
+    if epochs_no_improve >= patience:
+        print("Early stopping triggered.")
+        break
 
 # Total training time
 total_training_time = time.time() - total_start_time
 print(f"Total training time: {total_training_time:.2f} seconds")
 
-# Save the final model weights with a dynamic name
-torch.save(model.state_dict(), model_weights_path)
-
-# Append final training time to the log file
+# Log final training time to the file
 with open(log_file, 'a') as f:
     f.write(f"Total Training Time: {total_training_time:.2f} seconds\n")
-    f.write(f"Model Weights saved to {model_weights_path}\n")
+    f.write(f"Best Model Weights saved to {best_model_weights_path}\n")
 
 # Run validation after the entire training process
 validate(model, val_loader, device)
+

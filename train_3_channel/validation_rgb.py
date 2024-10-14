@@ -16,16 +16,18 @@ def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
     return val_loader
 
 # Validation function with IoU, Precision, Recall, and F1 Score
-def validate(model, val_loader, device):
+def validate(model, val_loader, device, visualize_results=False):
     model.eval()
     ious, precisions, recalls, f1s = [], [], [], []
+    total_loss = 0.0
+    criterion = torch.nn.CrossEntropyLoss()
 
     with torch.no_grad():
-        for rgb_image, target in val_loader:
-            rgb_image = rgb_image.to(device)
+        for fused_image, target in val_loader:
+            fused_image = fused_image.to(device)
             target = target.to(device)
 
-            output = model(rgb_image)
+            output = model(fused_image)
             pred = torch.argmax(output, dim=1)
 
             # Calculate IoU, Precision, Recall, F1 Score
@@ -37,20 +39,30 @@ def validate(model, val_loader, device):
             recalls.append(recall.cpu().numpy())
             f1s.append(f1_score.cpu().numpy())
 
-            # Visualize original image, prediction, and IoU visualization
-            visualize(rgb_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy())
+            # Calculate and accumulate validation loss
+            loss = criterion(output, target)
+            total_loss += loss.item()
 
-    # Compute the average of each metric
+            # Optionally visualize results
+            if visualize_results:
+                visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy())
+
+    # Compute the average metrics
     avg_iou = np.mean(ious)
     avg_precision = np.mean(precisions)
     avg_recall = np.mean(recalls)
     avg_f1 = np.mean(f1s)
 
+    # Calculate average loss
+    avg_loss = total_loss / len(val_loader)
+
     print(f'Average IoU: {avg_iou:.4f}')
     print(f'Average Precision: {avg_precision:.4f}')
     print(f'Average Recall: {avg_recall:.4f}')
     print(f'Average F1 Score: {avg_f1:.4f}')
+    print(f'Average Validation Loss: {avg_loss:.4f}')
 
+    return avg_loss
 # Calculate precision, recall, and F1 score
 def calculate_metrics(pred, target):
     tp = ((pred == 1) & (target == 1)).float().sum((1, 2))
