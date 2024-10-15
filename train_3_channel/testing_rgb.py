@@ -31,11 +31,11 @@ val_dataset = RGBDataset(val_annotations, val_npy_dir, transform=None)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Path to your trained RGB model weights
-trained_model_path = 'runs/3_channel/2024-10-14_15-20-10/best_model_weights.pth'  # Replace with your path
+trained_model_path = 'runs/3_channel/2024-10-15_16-06-32/best_model_weights.pth'  # Replace with your path
 
 # Load the trained model
 model = load_trained_model(trained_model_path)
 
 # Run the validation script
 print("Running validation on RGB images...")
-validate(model, val_loader, device, visualize_results=True)
+validate(model, val_loader, device, visualize_results=False)

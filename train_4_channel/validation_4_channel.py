@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 import json
-from dataset import RGBNIRDataset
+from dataset_4_channel import RGBNIRDataset
 import matplotlib.pyplot as plt
 import numpy as np
 

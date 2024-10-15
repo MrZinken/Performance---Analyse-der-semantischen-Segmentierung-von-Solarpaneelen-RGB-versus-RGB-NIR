@@ -5,9 +5,9 @@ import json
 import time
 import os
 import psutil
-from dataset import RGBNIRDataset
-from train_4_channel.model_4_channel import MultimodalSegmentationModel
-from train_4_channel.validation_4_channel import validate, get_validation_loader
+from dataset_4_channel import RGBNIRDataset
+from model_4_channel import MultimodalSegmentationModel
+from validation_4_channel import validate, get_validation_loader
 from datetime import datetime
 
 # Set device (GPU if available, else CPU)

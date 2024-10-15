@@ -84,7 +84,7 @@ epochs_no_improve = 0
 total_start_time = time.time()
 
 # Training loop
-num_epochs = 40
+num_epochs = 100
 for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0

@@ -3,7 +3,8 @@ from torch.utils.data import DataLoader
 import json
 import os
 from dataset_loader_fusion import RGBNIRDataset
-from model_fusion import MultimodalSegmentationModel
+#from model_fusion import MultimodalSegmentationModel
+from cross_attention_model import MultimodalSegmentationModel
 from validation_fusion import validate
 
 # Set device (GPU if available, else CPU)
@@ -30,7 +31,7 @@ def get_testing_loader(test_annotations_path, test_npy_dir, batch_size=1):
 # Main testing script
 if __name__ == "__main__":
     # Paths to the model and testing data
-    best_model_weights_path = 'runs/fusion/2024-10-14_15-38-10/best_model_weights.pth'
+    best_model_weights_path = 'runs/cross_fusion/2024-10-15_14-57-39/best_model_weights.pth'
     test_annotations_path = '/home/kai/Documents/dataset/test/_annotations.coco.json'
     test_npy_dir = '/home/kai/Documents/dataset/test'
 
