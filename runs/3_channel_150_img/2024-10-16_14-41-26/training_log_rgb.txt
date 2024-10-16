@@ -1,0 +1,319 @@
+Original dataset size: 150
+No augmentations applied.
+Epoch 1:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.2663
+Validation Loss: 0.2312
+Time Taken for Epoch: 8.22 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 8.22 seconds
+
+Epoch 2:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.1467
+Validation Loss: 0.1741
+Time Taken for Epoch: 8.09 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 19.41 seconds
+
+Epoch 3:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.1148
+Validation Loss: 0.1455
+Time Taken for Epoch: 8.35 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 30.91 seconds
+
+Epoch 4:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0978
+Validation Loss: 0.1308
+Time Taken for Epoch: 8.13 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 42.31 seconds
+
+Epoch 5:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0834
+Validation Loss: 0.1226
+Time Taken for Epoch: 8.26 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 53.79 seconds
+
+Epoch 6:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0746
+Validation Loss: 0.1149
+Time Taken for Epoch: 8.25 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 65.31 seconds
+
+Epoch 7:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0652
+Validation Loss: 0.1120
+Time Taken for Epoch: 8.11 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 76.72 seconds
+
+Epoch 8:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0598
+Validation Loss: 0.1085
+Time Taken for Epoch: 8.42 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 88.67 seconds
+
+Epoch 9:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0570
+Validation Loss: 0.1096
+Time Taken for Epoch: 8.29 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 100.26 seconds
+
+Epoch 10:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0504
+Validation Loss: 0.1034
+Time Taken for Epoch: 8.29 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 111.57 seconds
+
+Epoch 11:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0489
+Validation Loss: 0.0997
+Time Taken for Epoch: 8.32 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 123.45 seconds
+
+Epoch 12:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0463
+Validation Loss: 0.1009
+Time Taken for Epoch: 8.00 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 134.71 seconds
+
+Epoch 13:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0422
+Validation Loss: 0.0989
+Time Taken for Epoch: 8.09 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 145.69 seconds
+
+Epoch 14:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0410
+Validation Loss: 0.0963
+Time Taken for Epoch: 7.97 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 156.86 seconds
+
+Epoch 15:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0394
+Validation Loss: 0.0957
+Time Taken for Epoch: 8.10 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 168.25 seconds
+
+Epoch 16:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0375
+Validation Loss: 0.0946
+Time Taken for Epoch: 8.15 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 179.82 seconds
+
+Epoch 17:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0365
+Validation Loss: 0.0943
+Time Taken for Epoch: 8.22 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 191.18 seconds
+
+Epoch 18:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0356
+Validation Loss: 0.0952
+Time Taken for Epoch: 8.19 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 202.71 seconds
+
+Epoch 19:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0345
+Validation Loss: 0.0932
+Time Taken for Epoch: 8.10 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 213.87 seconds
+
+Epoch 20:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0352
+Validation Loss: 0.0942
+Time Taken for Epoch: 8.18 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 225.32 seconds
+
+Epoch 21:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0326
+Validation Loss: 0.0942
+Time Taken for Epoch: 8.21 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 236.49 seconds
+
+Epoch 22:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0314
+Validation Loss: 0.0936
+Time Taken for Epoch: 8.04 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 247.53 seconds
+
+Epoch 23:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0293
+Validation Loss: 0.0929
+Time Taken for Epoch: 8.01 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 258.50 seconds
+
+Epoch 24:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0287
+Validation Loss: 0.0920
+Time Taken for Epoch: 7.96 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 269.72 seconds
+
+Epoch 25:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0283
+Validation Loss: 0.0926
+Time Taken for Epoch: 8.20 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 281.25 seconds
+
+Epoch 26:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0283
+Validation Loss: 0.0929
+Time Taken for Epoch: 8.10 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 292.29 seconds
+
+Epoch 27:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0282
+Validation Loss: 0.0916
+Time Taken for Epoch: 8.00 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 303.24 seconds
+
+Epoch 28:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0279
+Validation Loss: 0.0944
+Time Taken for Epoch: 8.15 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 314.59 seconds
+
+Epoch 29:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0270
+Validation Loss: 0.0922
+Time Taken for Epoch: 8.12 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 325.72 seconds
+
+Epoch 30:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0258
+Validation Loss: 0.0905
+Time Taken for Epoch: 8.12 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 336.77 seconds
+
+Epoch 31:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0247
+Validation Loss: 0.0909
+Time Taken for Epoch: 8.16 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 348.24 seconds
+
+Epoch 32:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0251
+Validation Loss: 0.0906
+Time Taken for Epoch: 8.36 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 359.64 seconds
+
+Epoch 33:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0242
+Validation Loss: 0.0933
+Time Taken for Epoch: 8.19 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 370.94 seconds
+
+Epoch 34:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0237
+Validation Loss: 0.0912
+Time Taken for Epoch: 7.90 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 381.72 seconds
+
+Epoch 35:
+Batch Size: 6
+Learning Rate: 1e-05
+Loss: 0.0239
+Validation Loss: 0.0921
+Time Taken for Epoch: 7.95 seconds
+GPU Memory Usage: 598.66 MB
+Total Time So Far: 392.54 seconds
+
+Total Training Time: 395.43 seconds
+Best Model Weights saved to /home/kai/Documents/Performance---Analyse-der-semantischen-Segmentierung-von-Solarpaneelen-RGB-versus-RGB-NIR/runs/3_channel_150_img/2024-10-16_14-41-26/best_model_weights.pth

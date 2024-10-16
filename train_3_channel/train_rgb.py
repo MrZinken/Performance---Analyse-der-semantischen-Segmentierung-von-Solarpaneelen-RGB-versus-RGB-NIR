@@ -34,114 +34,115 @@ def log_dataset_info(dataset, filepath):
 # Create a folder for the current run based on date and time
 def create_run_directory():
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', '3_channel', timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', '3_channel_150_img', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 
-# Load training annotations
-with open('/home/kai/Documents/dataset/train/_annotations.coco.json', 'r') as f:
-    train_annotations = json.load(f)
+# Function to train the model and log results
+def train_model(num_epochs, train_loader, val_loader, learning_rate, batch_size):
+    # Initialize the model
+    model = RGBSegmentationModel(num_classes=2).to(device)
 
-# Load validation annotations
-val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
+    # Set up loss function and optimizer
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-# Set the paths to the dataset
-train_npy_dir = '/home/kai/Documents/dataset/train'
-val_npy_dir = '/home/kai/Documents/dataset/valid'
+    # Create a run directory for saving logs and model weights
+    run_dir = create_run_directory()
+    log_file = os.path.join(run_dir, 'training_log_rgb.txt')
+    best_model_weights_path = os.path.join(run_dir, 'best_model_weights.pth')
 
-# Load the dataset
-batch_size = 3
-train_dataset = RGBDataset(train_annotations, train_npy_dir, transform=None)
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    # Log dataset info
+    log_dataset_info(train_loader.dataset, log_file)
 
-# Get validation loader
-val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size=batch_size)
+    # Early stopping parameters
+    patience = 5
+    best_val_loss = float('inf')
+    epochs_no_improve = 0
 
-# Initialize the model
-model = RGBSegmentationModel(num_classes=2).to(device)
+    # Timing and memory tracking variables
+    total_start_time = time.time()
 
-# Set up loss function and optimizer
-learning_rate = 1e-5
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        start_time = time.time()
 
-# Create a run directory for saving logs and model weights
-run_dir = create_run_directory()
-log_file = os.path.join(run_dir, 'training_log_rgb.txt')
+        for rgb_image, target in train_loader:
+            rgb_image = rgb_image.to(device)
+            target = target.to(device)
 
-# Best model saving path
-best_model_weights_path = os.path.join(run_dir, 'best_model_weights.pth')
+            optimizer.zero_grad()
+            output = model(rgb_image)
 
-# Log dataset info
-log_dataset_info(train_dataset, log_file)
+            # Compute loss
+            loss = criterion(output, target)
+            loss.backward()
+            optimizer.step()
 
-# Early stopping parameters
-patience = 5
-best_val_loss = float('inf')
-epochs_no_improve = 0
+            running_loss += loss.item()
 
-# Timing and memory tracking variables
-total_start_time = time.time()
+        # Calculate average training loss for this epoch
+        avg_loss = running_loss / len(train_loader)
+        epoch_time = time.time() - start_time
+        total_time = time.time() - total_start_time
+        gpu_mem = torch.cuda.memory_allocated(device) if torch.cuda.is_available() else psutil.virtual_memory().used
 
-# Training loop
-num_epochs = 100
-for epoch in range(num_epochs):
-    model.train()
-    running_loss = 0.0
-    start_time = time.time()
+        # Run validation and calculate validation loss
+        val_loss = validate(model, val_loader, device, visualize_results=False)
 
-    for rgb_image, target in train_loader:
-        rgb_image = rgb_image.to(device)
-        target = target.to(device)
+        # Print metrics for the epoch
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')
 
-        optimizer.zero_grad()
-        output = model(rgb_image)
+        # Log metrics to the file
+        log_metrics(epoch+1, batch_size, learning_rate, avg_loss, val_loss, epoch_time, gpu_mem, total_time, log_file)
 
-        # Compute loss
-        loss = criterion(output, target)
-        loss.backward()
-        optimizer.step()
+        # Early stopping logic and save the best model
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            epochs_no_improve = 0
+            torch.save(model.state_dict(), best_model_weights_path)
+            print(f"Saving best model with validation loss: {best_val_loss:.4f}")
+        else:
+            epochs_no_improve += 1
+            print(f"Validation loss did not improve. Patience: {epochs_no_improve}/{patience}")
 
-        running_loss += loss.item()
+        if epochs_no_improve >= patience:
+            print("Early stopping triggered.")
+            break
 
-    # Calculate average training loss for this epoch
-    avg_loss = running_loss / len(train_loader)
-    epoch_time = time.time() - start_time
-    total_time = time.time() - total_start_time
-    gpu_mem = torch.cuda.memory_allocated(device) if torch.cuda.is_available() else psutil.virtual_memory().used
+    # Total training time
+    total_training_time = time.time() - total_start_time
+    print(f"Total training time: {total_training_time:.2f} seconds")
 
-    # Run validation and calculate validation loss
-    val_loss = validate(model, val_loader, device, visualize_results=False)
+    # Log final training time to the file
+    with open(log_file, 'a') as f:
+        f.write(f"Total Training Time: {total_training_time:.2f} seconds\n")
+        f.write(f"Best Model Weights saved to {best_model_weights_path}\n")
 
-    # Print metrics for the epoch
-    print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')
+# Main function to execute multiple trainings
+def run_multiple_trainings(num_trainings, num_epochs):
+    for i in range(num_trainings):
+        print(f"\nStarting training run {i + 1}/{num_trainings}")
+        
+        # Load training annotations
+        with open('/home/kai/Documents/dataset_150/train/_annotations.coco.json', 'r') as f:
+            train_annotations = json.load(f)
+        
+        # Load the dataset
+        train_npy_dir = '/home/kai/Documents/dataset_150/train'
+        val_npy_dir = '/home/kai/Documents/dataset_150/valid'
+        batch_size = 6
+        train_dataset = RGBDataset(train_annotations, train_npy_dir, transform=None)
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        val_loader = get_validation_loader('/home/kai/Documents/dataset_150/valid/_annotations.coco.json', val_npy_dir, batch_size=batch_size)
+        
+        # Train the model
+        train_model(num_epochs, train_loader, val_loader, learning_rate=1e-5, batch_size=batch_size)
 
-    # Log metrics to the file
-    log_metrics(epoch+1, batch_size, learning_rate, avg_loss, val_loss, epoch_time, gpu_mem, total_time, log_file)
+# Set the number of trainings
+num_trainings = 10  # You can set this to the desired number of training runs
+num_epochs = 100   # Number of epochs per training run
 
-    # Early stopping logic and save the best model
-    if val_loss < best_val_loss:
-        best_val_loss = val_loss
-        epochs_no_improve = 0
-        torch.save(model.state_dict(), best_model_weights_path)
-        print(f"Saving best model with validation loss: {best_val_loss:.4f}")
-    else:
-        epochs_no_improve += 1
-        print(f"Validation loss did not improve. Patience: {epochs_no_improve}/{patience}")
-
-    if epochs_no_improve >= patience:
-        print("Early stopping triggered.")
-        break
-
-# Total training time
-total_training_time = time.time() - total_start_time
-print(f"Total training time: {total_training_time:.2f} seconds")
-
-# Log final training time to the file
-with open(log_file, 'a') as f:
-    f.write(f"Total Training Time: {total_training_time:.2f} seconds\n")
-    f.write(f"Best Model Weights saved to {best_model_weights_path}\n")
-
-# Run validation after the entire training process
-validate(model, val_loader, device)
-
+# Run the trainings
+run_multiple_trainings(num_trainings, num_epochs)

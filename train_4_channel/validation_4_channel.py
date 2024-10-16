@@ -55,13 +55,22 @@ def validate(model, val_loader, device, visualize_results=False):
     # Calculate average loss
     avg_loss = total_loss / len(val_loader)
 
+    # Print metrics for display purposes
     print(f'Average IoU: {avg_iou:.4f}')
     print(f'Average Precision: {avg_precision:.4f}')
     print(f'Average Recall: {avg_recall:.4f}')
     print(f'Average F1 Score: {avg_f1:.4f}')
     print(f'Average Validation Loss: {avg_loss:.4f}')
 
-    return avg_loss
+    # Return metrics as a dictionary
+    return {
+        'IoU': avg_iou,
+        'Precision': avg_precision,
+        'Recall': avg_recall,
+        'F1 Score': avg_f1,
+        'Validation Loss': avg_loss
+    }
+
 
 
 # Calculate precision, recall, and F1 score

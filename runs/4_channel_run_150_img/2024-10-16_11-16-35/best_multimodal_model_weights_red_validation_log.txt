@@ -1,0 +1,3 @@
+Total inference time: 2.2757 seconds
+Average inference time per image: 0.0228 seconds
+Validation Metrics:
