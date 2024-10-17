@@ -49,7 +49,7 @@ def rename_files_and_update_annotations(images_dir):
                 print(f"Updated annotations saved to {annotations_file}")
 
 # Usage example
-images_directory = '/home/kai/Downloads/dataset_150'
+images_directory = '/home/kai/Desktop/Downloads/dataset_75'
 
 rename_files_and_update_annotations(images_directory)
 

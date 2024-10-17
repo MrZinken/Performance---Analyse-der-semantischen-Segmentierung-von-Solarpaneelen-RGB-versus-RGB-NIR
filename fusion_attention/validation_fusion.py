@@ -40,15 +40,14 @@ def validate(model, val_loader, device, visualize_results=False):
             f1s.append(f1_score.cpu().numpy())
 
             # Calculate and accumulate validation loss
-            target_resized = F.interpolate(target.unsqueeze(1).float(), size=output.shape[2:], mode='nearest').squeeze(1).long()
-            loss = criterion(output, target_resized)
+            loss = criterion(output, target)
             total_loss += loss.item()
 
-            # Conditionally visualize results
+            # Optionally visualize results
             if visualize_results:
-                visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy(), pred, target)
-    
-    # Compute the average of each metric
+                visualize(fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy())
+
+    # Compute the average metrics
     avg_iou = np.mean(ious)
     avg_precision = np.mean(precisions)
     avg_recall = np.mean(recalls)
@@ -57,13 +56,21 @@ def validate(model, val_loader, device, visualize_results=False):
     # Calculate average loss
     avg_loss = total_loss / len(val_loader)
 
+    # Print metrics for display purposes
     print(f'Average IoU: {avg_iou:.4f}')
     print(f'Average Precision: {avg_precision:.4f}')
     print(f'Average Recall: {avg_recall:.4f}')
     print(f'Average F1 Score: {avg_f1:.4f}')
     print(f'Average Validation Loss: {avg_loss:.4f}')
 
-    return avg_loss
+    # Return metrics as a dictionary
+    return {
+        'IoU': avg_iou,
+        'Precision': avg_precision,
+        'Recall': avg_recall,
+        'F1 Score': avg_f1,
+        'Validation Loss': avg_loss
+    }
 
 
 

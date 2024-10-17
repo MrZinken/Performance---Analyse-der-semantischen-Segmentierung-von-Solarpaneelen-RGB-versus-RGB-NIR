@@ -54,8 +54,8 @@ def copy_and_rename_files_for_datasets(dataset_folder, slices_folder):
     find_and_copy_and_rename_numpy_arrays(test_annotation_file, slices_folder, test_target_directory)
 
 # Example usage
-dataset_folder = '/home/kai/Downloads/dataset_150'  # Path to the dataset folder containing 'train' and 'valid'
-slices_folder = '/home/kai/Documents/slices'  # Path to the folder containing the NumPy arrays
+dataset_folder = '/home/kai/Desktop/Downloads/dataset_75'  # Path to the dataset folder containing 'train' and 'valid'
+slices_folder = '/media/kai/data/slices'  # Path to the folder containing the NumPy arrays
 
 copy_and_rename_files_for_datasets(dataset_folder, slices_folder)
 
