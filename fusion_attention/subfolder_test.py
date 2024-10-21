@@ -10,13 +10,35 @@ from validation_fusion import validate
 # Set the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load the model
-def load_trained_model(model_path, num_classes=2):
+def load_trained_model_with_mapping(model_path, num_classes=2):
     model = MultimodalSegmentationModel(num_classes=num_classes)
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    state_dict = torch.load(model_path, map_location=device)
+    
+    # Remap keys to align with current model structure
+    new_state_dict = {}
+    for key, value in state_dict.items():
+        if "cross_attention" in key:
+            new_key = key.replace("cross_attention", "multi_head_attention")
+            new_state_dict[new_key] = value
+        else:
+            new_state_dict[key] = value
+    
+    # Load state dict, but ignore layers that don't match the current model structure
+    model_state_dict = model.state_dict()
+    new_state_dict_filtered = {k: v for k, v in new_state_dict.items() if k in model_state_dict and v.size() == model_state_dict[k].size()}
+
+    # Print out keys that are mismatched and won't be loaded
+    missing_keys = set(model_state_dict.keys()) - set(new_state_dict_filtered.keys())
+    if missing_keys:
+        print(f"Warning: The following keys are missing or mismatched in the loaded state_dict and will be randomly initialized: {missing_keys}")
+
+    model_state_dict.update(new_state_dict_filtered)
+    model.load_state_dict(model_state_dict)
     model.to(device)
     model.eval()
     return model
+
+
 
 # Function to validate and log results
 def validate_and_log(model, test_loader, device, metrics_log):
@@ -82,8 +104,8 @@ def process_all_models_in_directory(base_dir, test_annotations_path, test_npy_di
         model_name = os.path.basename(model_path).replace('.pth', '')
         print(f"Validating model: {model_name}")
         
-        # Load model
-        model = load_trained_model(model_path)
+        # Load model with remapped keys
+        model = load_trained_model_with_mapping(model_path)
         
         # Validate and log results
         validate_and_log(model, test_loader, device, metrics_log)

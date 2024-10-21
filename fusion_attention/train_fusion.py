@@ -16,7 +16,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Function to create a directory for saving logs and model weights
 def create_run_directory(run_count):
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', 'fusion', f"run_{run_count}", timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', 'cross_fusion', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 
@@ -34,7 +34,7 @@ val_npy_dir = '/home/kai/Documents/dataset/valid'
 # Parameters
 batch_size = 3
 num_epochs = 100
-num_models_to_train = 5  # Set the desired number of models to train
+num_models_to_train = 2  # Set the desired number of models to train
 
 # Create DataLoader for training and validation
 train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None)
@@ -107,7 +107,10 @@ for run_count in range(1, num_models_to_train + 1):
         gpu_memory = torch.cuda.memory_allocated(device) / (1024 ** 2) if torch.cuda.is_available() else 0
 
         # Run validation and calculate validation loss
-        val_loss = validate(model, val_loader, device, visualize_results=False)
+        val_metrics = validate(model, val_loader, device, visualize_results=False)
+
+        # Extract the validation loss from the metrics dictionary
+        val_loss = val_metrics['Validation Loss']
 
         # Log epoch details
         with open(log_file, 'a') as f:
