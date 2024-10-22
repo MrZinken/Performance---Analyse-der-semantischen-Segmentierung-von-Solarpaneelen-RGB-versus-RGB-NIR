@@ -1,10 +1,7 @@
-import scipy.stats as stats
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 #300 training images Dataset
-
+"""
 fusion_iou = [0.8456296920776367, 0.8231863975524902, 0.8323723077774048, 0.8065193891525269, 0.853040337562561, 0.779777467250824, 0.8334035873413086, 0.8227640986442566, 0.8242654204368591, 0.8218393325805664]
 fusion_f1 = [0.9102001190185547, 0.8916281461715698, 0.895847499370575, 0.8854640126228333, 0.9154802560806274, 0.8560321927070618, 0.9008628726005554, 0.891095757484436, 0.8930608034133911, 0.8889360427856445]
 fusion_precision = [0.9361903667449951, 0.9109013676643372, 0.9381046295166016, 0.9079286456108093, 0.9290487170219421, 0.945119321346283, 0.9327863454818726, 0.896541953086853, 0.9316450953483582, 0.9071054458618164]
@@ -25,7 +22,7 @@ rgb_ir_precision = [0.940501868724823, 0.9405944347381592, 0.9175294041633606, 0
 rgb_ir_recall = [0.9073808193206787, 0.9007394313812256, 0.9256730675697327, 0.9140843152999878, 0.9018212556838989, 0.9086824059486389, 0.8983797430992126, 0.9115302562713623, 0.9123995304107666, 0.9119364619255066]
 rgb_ir_training_time = [361.24, 324.14, 289.16, 281.85, 307.28, 271.90, 297.51, 353.00, 327.85, 330.47]
 rgb_ir_inference_time = [0.026786688602331913, 0.022996599023992367, 0.022095037229133373, 0.021898240754098602, 0.02189970738960035, 0.022136168046431107, 0.021437449888749557, 0.021139535036954014, 0.02113296768882058, 0.022025325081565163]
-
+"""
 
 
 #150 training images Dataset
@@ -54,7 +51,7 @@ rgb_ir_inference_time = [0.02546787738800049, 0.021612212657928467, 0.0217680168
 """
 
 #75 training images Dataset
-"""
+
 fusion_iou = [0.6304159760475159, 0.5985770225524902, 0.612906813621521, 0.6071501970291138, 0.6126234531402588, 0.6125524640083313, 0.6473525762557983, 0.5721817016601562, 0.6170665621757507, 0.6019647121429443]
 fusion_f1 = [0.7355136275291443, 0.7128382325172424, 0.7213715314865112, 0.7047984600067139, 0.7150160074234009, 0.7146912217140198, 0.748618483543396, 0.6786147952079773, 0.7216756343841553, 0.7106720209121704]
 fusion_precision = [0.8299034237861633, 0.8248817920684814, 0.8212370276451111, 0.8080577850341797, 0.8069779872894287, 0.8209850192070007, 0.8369370102882385, 0.7988770008087158, 0.851389467716217, 0.8109037280082703]
@@ -76,71 +73,28 @@ rgb_ir_precision = [0.7824720144271851, 0.767415463924408, 0.7751535773277283, 0
 rgb_ir_recall = [0.6221457719802856, 0.6671560406684875, 0.686299741268158, 0.8136035203933716, 0.6404266357421875, 0.7520217895507812, 0.7344262599945068, 0.6908274292945862, 0.6068583130836487, 0.6566419005393982]
 rgb_ir_training_time = [99.34, 80.03, 90.29, 116.92, 80.15, 82.25, 82.49, 110.35, 82.29, 92.40]
 rgb_ir_inference_time = [0.023327858448028566, 0.02065871477127075, 0.02111328125, 0.02147003173828125, 0.021662890911102295, 0.02180447816848755, 0.02158538579940796, 0.022649943828582764, 0.02100773811340332, 0.020687925815582275]
-"""
 
 
-array_names = ['RGB F1', '4-Channel F1', 'Fusion F1']
-arrays = [rgb_iou, rgb_ir_iou, fusion_iou]
+# Function to calculate averages and log them
+def calculate_and_log_averages(log_filepath):
+    with open(log_filepath, 'w') as log_file:
+        arrays = {
+            "Fusion IoU": fusion_iou, "Fusion F1": fusion_f1, "Fusion Precision": fusion_precision, "Fusion Recall": fusion_recall,
+            "Fusion Training Time": fusion_training_time, "Fusion Inference Time": fusion_inference_time,
+            "RGB IoU": rgb_iou, "RGB F1": rgb_f1, "RGB Precision": rgb_precision, "RGB Recall": rgb_recall,
+            "RGB Training Time": rgb_training_time, "RGB Inference Time": rgb_inference_time,
+            "RGB+IR IoU": rgb_ir_iou, "RGB+IR F1": rgb_ir_f1, "RGB+IR Precision": rgb_ir_precision, "RGB+IR Recall": rgb_ir_recall,
+            "RGB+IR Training Time": rgb_ir_training_time, "RGB+IR Inference Time": rgb_ir_inference_time
+        }
 
-# Print side-by-side comparison
-print(f"{array_names[0]}\t\t{array_names[1]}\t\t{array_names[2]}\t\tDifference (1-2)   Difference (1-3)")
-print("-" * 60)
-for val1, val2, val3 in zip(*arrays):
-    print(f"{val1:.4f}\t\t{val2:.4f}\t\t{val3:.4f}\t\t{val1 - val2:.4f}   \t{val1 - val3:.4f}")
+        # Calculate averages
+        for key, value in arrays.items():
+            avg_value = np.mean(value)
+            print(f"{key} Average: {avg_value:.4f}")
+            log_file.write(f"{key} Average: {avg_value:.4f}\n")
 
-# Calculate paired t-Test between all combinations
-for i in range(len(arrays)):
-    for j in range(i + 1, len(arrays)):
-        diff = np.array(arrays[i]) - np.array(arrays[j])
-        t_stat, p_value = stats.ttest_rel(arrays[i], arrays[j])
-        mean_diff = np.mean(diff)
-        std_diff = np.std(diff, ddof=1)
-        n = len(diff)
-        t_value = stats.t.ppf((1 + 0.95) / 2, df=n - 1)
-        margin_of_error = t_value * (std_diff / np.sqrt(n))
-        conf_interval = (mean_diff - margin_of_error, mean_diff + margin_of_error)
+# Define log file path
+log_file_path = 'averages_75_images.txt'
 
-        print(f"\nComparison between {array_names[i]} and {array_names[j]}:")
-        print(f"T-statistic: {t_stat:.4f}, p-value: {p_value:.4f}")
-        print(f"Mean Difference: {mean_diff:.4f} ± {std_diff/np.sqrt(n):.4f}")
-        print(f"95% Confidence Interval (t-Test): ({conf_interval[0]:.4f}, {conf_interval[1]:.4f})\n")
-
-# Error Bar Plot for all arrays
-means = [np.mean(arr) for arr in arrays]
-ses = [np.std(arr, ddof=1) / np.sqrt(len(arr)) for arr in arrays]
-y_min = min([m - se for m, se in zip(means, ses)]) - 0.005
-y_max = max([m + se for m, se in zip(means, ses)]) + 0.005
-
-plt.figure(figsize=(8, 6))
-bars = plt.bar(array_names, means, yerr=ses, capsize=10, color=['gray', 'lightblue', 'lightgreen'])
-plt.ylabel('F1 Score')  # Manually setting the y-axis title
-plt.ylim([y_min, y_max])
-plt.title('F1 Score for 300img Dataset')
-
-# Annotate bars with mean and standard error
-for bar, mean, se in zip(bars, means, ses):
-    plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + se + 0.0005,
-             f'Mean: {mean:.4f}\nSE: ±{se:.4f}', ha='center', va='bottom', fontsize=9)
-
-plt.legend([f'Mean ± SE'], loc='upper right')
-plt.show()
-
-# Bootstrap Distribution Plot for Differences between arrays
-plt.figure(figsize=(15, 5))
-for i in range(len(arrays) - 1):
-    for j in range(i + 1, len(arrays)):
-        diff = np.array(arrays[i]) - np.array(arrays[j])
-        n_bootstraps = 10000
-        bootstrapped_means = [np.mean(np.random.choice(diff, size=n, replace=True)) for _ in range(n_bootstraps)]
-        lower_bootstrap, upper_bootstrap = np.percentile(bootstrapped_means, [2.5, 97.5])
-        
-        sns.histplot(bootstrapped_means, bins=30, kde=True, label=f"{array_names[i]} - {array_names[j]}")
-        plt.axvline(lower_bootstrap, color='blue', linestyle=':', label=f"95% CI Bootstrap {array_names[i]} - {array_names[j]}")
-        plt.axvline(upper_bootstrap, color='blue', linestyle=':')
-
-plt.axvline(0, color='black', linestyle='-', label="Mean Difference")
-plt.title("Bootstrap Distribution of Mean Differences")
-plt.xlabel("Difference in Inference Time")
-plt.ylabel("Frequency")
-plt.legend()
-plt.show()
+# Call the function to calculate and log averages
+calculate_and_log_averages(log_file_path)

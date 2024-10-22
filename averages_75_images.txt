@@ -1,0 +1,18 @@
+Fusion IoU Average: 0.6113
+Fusion F1 Average: 0.7164
+Fusion Precision Average: 0.8210
+Fusion Recall Average: 0.6937
+Fusion Training Time Average: 685.4490
+Fusion Inference Time Average: 0.0318
+RGB IoU Average: 0.4962
+RGB F1 Average: 0.5999
+RGB Precision Average: 0.7241
+RGB Recall Average: 0.5729
+RGB Training Time Average: 101.6250
+RGB Inference Time Average: 0.0202
+RGB+IR IoU Average: 0.5803
+RGB+IR F1 Average: 0.6837
+RGB+IR Precision Average: 0.7667
+RGB+IR Recall Average: 0.6870
+RGB+IR Training Time Average: 91.6510
+RGB+IR Inference Time Average: 0.0216
