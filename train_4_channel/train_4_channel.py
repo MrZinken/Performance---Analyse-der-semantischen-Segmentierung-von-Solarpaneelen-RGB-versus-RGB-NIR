@@ -35,7 +35,7 @@ def log_dataset_info(dataset, filepath, init_type):
 # Create a folder for the current run based on date and time
 def create_run_directory(run_number):
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', f'4_channel_run_150_img', timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', f'4_channel_75_img', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 
@@ -47,16 +47,16 @@ for run in range(1, n_runs + 1):
     print(f"Starting training run {run}/{n_runs}")
     
     # Load training annotations
-    with open('/home/kai/Documents/dataset_150/train/_annotations.coco.json', 'r') as f:
+    with open('/home/kai/Documents/dataset_75/train/_annotations.coco.json', 'r') as f:
         train_annotations = json.load(f)
-    train_npy_dir = '/home/kai/Documents/dataset_150/train'
+    train_npy_dir = '/home/kai/Documents/dataset_75/train'
 
     # Load validation annotations
-    val_annotations_path = '/home/kai/Documents/dataset_150/valid/_annotations.coco.json'
-    val_npy_dir = '/home/kai/Documents/dataset_150/valid'
+    val_annotations_path = '/home/kai/Documents/dataset_75/valid/_annotations.coco.json'
+    val_npy_dir = '/home/kai/Documents/dataset_75/valid'
 
     # Load the dataset
-    batch_size = 6
+    batch_size = 3
     train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
@@ -118,7 +118,8 @@ for run in range(1, n_runs + 1):
         gpu_mem = torch.cuda.memory_allocated(device) if torch.cuda.is_available() else psutil.virtual_memory().used
 
         # Run validation and calculate validation loss
-        val_loss = validate(model, val_loader, device, visualize_results=False)
+        val_metrics = validate(model, val_loader, device, visualize_results=False)
+        val_loss = val_metrics['Validation Loss']  # Extract the validation loss from the dictionary
 
         # Print metrics for the epoch
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')

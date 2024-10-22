@@ -1,0 +1,96 @@
+Original dataset size: 75
+No augmentations applied.
+Model initialized with NIR channel using method: red
+Epoch 1:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.2294
+Validation Loss: 0.2209
+Time Taken for Epoch: 4.35 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 4.35 seconds
+
+Epoch 2:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.1200
+Validation Loss: 0.1703
+Time Taken for Epoch: 4.27 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 13.49 seconds
+
+Epoch 3:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0892
+Validation Loss: 0.1423
+Time Taken for Epoch: 4.36 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 22.86 seconds
+
+Epoch 4:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0716
+Validation Loss: 0.1304
+Time Taken for Epoch: 4.35 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 32.21 seconds
+
+Epoch 5:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0611
+Validation Loss: 0.1293
+Time Taken for Epoch: 4.38 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 41.84 seconds
+
+Epoch 6:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0553
+Validation Loss: 0.1506
+Time Taken for Epoch: 4.35 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 51.34 seconds
+
+Epoch 7:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0537
+Validation Loss: 0.1715
+Time Taken for Epoch: 4.34 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 60.46 seconds
+
+Epoch 8:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0482
+Validation Loss: 0.1695
+Time Taken for Epoch: 4.29 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 69.45 seconds
+
+Epoch 9:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0418
+Validation Loss: 0.1664
+Time Taken for Epoch: 4.30 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 78.51 seconds
+
+Epoch 10:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0433
+Validation Loss: 0.1951
+Time Taken for Epoch: 4.30 seconds
+GPU Memory Usage: 528.09 MB
+Total Time So Far: 87.62 seconds
+
+Total Training Time: 92.40 seconds
+Best Model Weights saved to /home/kai/Documents/Performance---Analyse-der-semantischen-Segmentierung-von-Solarpaneelen-RGB-versus-RGB-NIR/runs/4_channel_75_img/2024-10-21_18-05-20/best_multimodal_model_weights_red.pth
+Model initialized with NIR channel using method: red

@@ -16,25 +16,25 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Function to create a directory for saving logs and model weights
 def create_run_directory(run_count):
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', 'cross_fusion', timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', 'cross_fusion_75_img', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 
 # Load training annotations
-with open('/home/kai/Documents/dataset/train/_annotations.coco.json', 'r') as f:
+with open('/home/kai/Documents/dataset_75/train/_annotations.coco.json', 'r') as f:
     train_annotations = json.load(f)
 
 # Load validation annotations
-val_annotations_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
+val_annotations_path = '/home/kai/Documents/dataset_75/valid/_annotations.coco.json'
 
 # Set the paths to the dataset
-train_npy_dir = '/home/kai/Documents/dataset/train'
-val_npy_dir = '/home/kai/Documents/dataset/valid'
+train_npy_dir = '/home/kai/Documents/dataset_75/train'
+val_npy_dir = '/home/kai/Documents/dataset_75/valid'
 
 # Parameters
 batch_size = 3
 num_epochs = 100
-num_models_to_train = 2  # Set the desired number of models to train
+num_models_to_train = 10  # Set the desired number of models to train
 
 # Create DataLoader for training and validation
 train_dataset = RGBNIRDataset(train_annotations, train_npy_dir, transform=None)

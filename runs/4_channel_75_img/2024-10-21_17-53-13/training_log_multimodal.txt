@@ -1,0 +1,87 @@
+Original dataset size: 75
+No augmentations applied.
+Model initialized with NIR channel using method: red
+Epoch 1:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.2168
+Validation Loss: 0.2080
+Time Taken for Epoch: 4.19 seconds
+GPU Memory Usage: 533.83 MB
+Total Time So Far: 4.19 seconds
+
+Epoch 2:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.1123
+Validation Loss: 0.1543
+Time Taken for Epoch: 4.24 seconds
+GPU Memory Usage: 533.34 MB
+Total Time So Far: 13.01 seconds
+
+Epoch 3:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0767
+Validation Loss: 0.1292
+Time Taken for Epoch: 4.20 seconds
+GPU Memory Usage: 533.83 MB
+Total Time So Far: 21.96 seconds
+
+Epoch 4:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0641
+Validation Loss: 0.1234
+Time Taken for Epoch: 4.23 seconds
+GPU Memory Usage: 533.34 MB
+Total Time So Far: 31.30 seconds
+
+Epoch 5:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0549
+Validation Loss: 0.1246
+Time Taken for Epoch: 4.26 seconds
+GPU Memory Usage: 533.83 MB
+Total Time So Far: 40.42 seconds
+
+Epoch 6:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0505
+Validation Loss: 0.1362
+Time Taken for Epoch: 4.26 seconds
+GPU Memory Usage: 533.34 MB
+Total Time So Far: 49.31 seconds
+
+Epoch 7:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0475
+Validation Loss: 0.1493
+Time Taken for Epoch: 4.25 seconds
+GPU Memory Usage: 533.83 MB
+Total Time So Far: 58.04 seconds
+
+Epoch 8:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0431
+Validation Loss: 0.1484
+Time Taken for Epoch: 4.22 seconds
+GPU Memory Usage: 533.34 MB
+Total Time So Far: 66.73 seconds
+
+Epoch 9:
+Batch Size: 3
+Learning Rate: 1e-05
+Loss: 0.0431
+Validation Loss: 0.1416
+Time Taken for Epoch: 4.21 seconds
+GPU Memory Usage: 533.83 MB
+Total Time So Far: 75.52 seconds
+
+Total Training Time: 80.03 seconds
+Best Model Weights saved to /home/kai/Documents/Performance---Analyse-der-semantischen-Segmentierung-von-Solarpaneelen-RGB-versus-RGB-NIR/runs/4_channel_75_img/2024-10-21_17-53-13/best_multimodal_model_weights_red.pth
+Model initialized with NIR channel using method: red

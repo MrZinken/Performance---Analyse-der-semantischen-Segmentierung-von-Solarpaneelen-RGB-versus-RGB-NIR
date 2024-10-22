@@ -117,8 +117,8 @@ def process_all_models_in_directory(base_dir, test_annotations_path, test_npy_di
 
 # Main function
 if __name__ == "__main__":
-    base_dir = 'runs/cross_fusion/'  # Replace with your base directory path
-    test_annotations_path = '/home/kai/Documents/dataset/test/_annotations.coco.json'
-    test_npy_dir = '/home/kai/Documents/dataset/test'
+    base_dir = 'runs/cross_fusion_75_img/'  # Replace with your base directory path
+    test_annotations_path = '/home/kai/Documents/dataset_75/test/_annotations.coco.json'
+    test_npy_dir = '/home/kai/Documents/dataset_75/test'
 
     process_all_models_in_directory(base_dir, test_annotations_path, test_npy_dir)

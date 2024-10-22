@@ -34,7 +34,7 @@ def log_dataset_info(dataset, filepath):
 # Create a folder for the current run based on date and time
 def create_run_directory():
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    run_dir = os.path.join(os.getcwd(), 'runs', '3_channel_150_img', timestamp)
+    run_dir = os.path.join(os.getcwd(), 'runs', '3_channel_75_img', timestamp)
     os.makedirs(run_dir, exist_ok=True)
     return run_dir
 
@@ -89,7 +89,8 @@ def train_model(num_epochs, train_loader, val_loader, learning_rate, batch_size)
         gpu_mem = torch.cuda.memory_allocated(device) if torch.cuda.is_available() else psutil.virtual_memory().used
 
         # Run validation and calculate validation loss
-        val_loss = validate(model, val_loader, device, visualize_results=False)
+        val_metrics = validate(model, val_loader, device, visualize_results=False)
+        val_loss = val_metrics['Validation Loss']  # Extract validation loss from metrics
 
         # Print metrics for the epoch
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Time: {epoch_time:.2f}s, GPU Memory: {gpu_mem / (1024 ** 2):.2f} MB')
@@ -126,16 +127,16 @@ def run_multiple_trainings(num_trainings, num_epochs):
         print(f"\nStarting training run {i + 1}/{num_trainings}")
         
         # Load training annotations
-        with open('/home/kai/Documents/dataset_150/train/_annotations.coco.json', 'r') as f:
+        with open('/home/kai/Documents/dataset_75/train/_annotations.coco.json', 'r') as f:
             train_annotations = json.load(f)
         
         # Load the dataset
-        train_npy_dir = '/home/kai/Documents/dataset_150/train'
-        val_npy_dir = '/home/kai/Documents/dataset_150/valid'
-        batch_size = 6
+        train_npy_dir = '/home/kai/Documents/dataset_75/train'
+        val_npy_dir = '/home/kai/Documents/dataset_75/valid'
+        batch_size = 3
         train_dataset = RGBDataset(train_annotations, train_npy_dir, transform=None)
         train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-        val_loader = get_validation_loader('/home/kai/Documents/dataset_150/valid/_annotations.coco.json', val_npy_dir, batch_size=batch_size)
+        val_loader = get_validation_loader('/home/kai/Documents/dataset_75/valid/_annotations.coco.json', val_npy_dir, batch_size=batch_size)
         
         # Train the model
         train_model(num_epochs, train_loader, val_loader, learning_rate=1e-5, batch_size=batch_size)
