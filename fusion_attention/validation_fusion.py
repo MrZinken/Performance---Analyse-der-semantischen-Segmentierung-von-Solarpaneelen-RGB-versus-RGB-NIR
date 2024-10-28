@@ -4,6 +4,7 @@ import json
 from dataset_loader_fusion import RGBNIRDataset
 import matplotlib.pyplot as plt
 import numpy as np
+from tqdm import tqdm
 import torch.nn.functional as F
 
 # Load validation annotations
@@ -16,17 +17,18 @@ def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
     
     return val_loader
 
-def validate(model, val_loader, device, visualize_results=False):
+def validate(model, data_loader, device, visualize_results=False):
     model.eval()
     ious, precisions, recalls, f1s = [], [], [], []
     total_loss = 0.0
     criterion = torch.nn.CrossEntropyLoss()
 
     with torch.no_grad():
-        for fused_image, target in val_loader:
+        for fused_image, target in tqdm(data_loader):
             fused_image = fused_image.to(device)
             target = target.to(device)
 
+            # Forward pass
             output = model(fused_image)
             pred = torch.argmax(output, dim=1)
 
@@ -34,6 +36,7 @@ def validate(model, val_loader, device, visualize_results=False):
             iou = calculate_iou(pred, target)
             precision, recall, f1_score = calculate_metrics(pred, target)
 
+            # Accumulate metrics
             ious.append(iou.cpu().numpy())
             precisions.append(precision.cpu().numpy())
             recalls.append(recall.cpu().numpy())
@@ -52,11 +55,9 @@ def validate(model, val_loader, device, visualize_results=False):
     avg_precision = np.mean(precisions)
     avg_recall = np.mean(recalls)
     avg_f1 = np.mean(f1s)
+    avg_loss = total_loss / len(data_loader)
 
-    # Calculate average loss
-    avg_loss = total_loss / len(val_loader)
-
-    # Print metrics for display purposes
+    # Print metrics
     print(f'Average IoU: {avg_iou:.4f}')
     print(f'Average Precision: {avg_precision:.4f}')
     print(f'Average Recall: {avg_recall:.4f}')
@@ -114,48 +115,39 @@ def calculate_iou(pred, target):
 
 
 
-# Visualize the image, prediction, target, and IoU-related areas
-def visualize(fused_image, pred, target, pred_tensor, target_tensor):
+# Visualize function without unused arguments
+def visualize(fused_image, pred, target):
     batch_size = fused_image.shape[0]
 
     for i in range(batch_size):
-        current_image = fused_image[i]  # Extract the i-th image from the batch
+        current_image = fused_image[i]
         current_pred = pred[i]
         current_target = target[i]
 
-        # Check if the image has at least 3 channels for RGB visualization
+        # Extract RGB for visualization
         if current_image.shape[0] >= 3:
-            rgb_image = current_image[:3, :, :]  # Extract first 3 channels (RGB)
-            rgb_image = np.transpose(rgb_image, (1, 2, 0))  # Transpose to (H, W, C)
+            rgb_image = current_image[:3, :, :]
+            rgb_image = np.transpose(rgb_image, (1, 2, 0))
 
-            # Rescale the pixel values to the [0, 1] range for proper visualization
             if rgb_image.max() > rgb_image.min():
                 rgb_image = (rgb_image - rgb_image.min()) / (rgb_image.max() - rgb_image.min())
             else:
-                # If all pixel values are the same, just make it a flat gray image
-                rgb_image = np.zeros_like(rgb_image) + 0.5  # Flat gray image to avoid visualization issues
+                rgb_image = np.zeros_like(rgb_image) + 0.5
         else:
             print(f"Fused image does not have 3 channels for RGB. It has {current_image.shape[0]} channels.")
-            continue  # Skip visualization if we can't extract RGB
+            continue
 
-        # Visualize the image, prediction, and target side by side
+        # Display the images
         plt.figure(figsize=(16, 4))
-        
-        # Show RGB image
         plt.subplot(1, 4, 1)
         plt.imshow(rgb_image)
         plt.title('Original RGB Image')
-        
-        # Show predicted mask in color
         plt.subplot(1, 4, 2)
-        plt.imshow(current_pred, cmap='coolwarm')  # Use a color map for better visualization
+        plt.imshow(current_pred, cmap='coolwarm')
         plt.title('Predicted Mask')
-        
-        # Show ground truth mask in color
         plt.subplot(1, 4, 3)
-        plt.imshow(current_target, cmap='coolwarm')  # Use a color map for better visualization
+        plt.imshow(current_target, cmap='coolwarm')
         plt.title('Ground Truth Mask')
-
         plt.show()
 
 

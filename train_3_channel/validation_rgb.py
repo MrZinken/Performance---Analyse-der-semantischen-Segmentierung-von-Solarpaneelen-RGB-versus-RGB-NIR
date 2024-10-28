@@ -15,7 +15,7 @@ def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):
     
     return val_loader
 
-def validate(model, val_loader, device, visualize_results=False):
+def validate(model, val_loader, device, visualize_results=True):
     model.eval()
     ious, precisions, recalls, f1s = [], [], [], []
     total_loss = 0.0

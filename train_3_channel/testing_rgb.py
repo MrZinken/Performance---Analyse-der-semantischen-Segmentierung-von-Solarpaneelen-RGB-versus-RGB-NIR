@@ -31,13 +31,13 @@ val_dataset = RGBDataset(val_annotations, val_npy_dir, transform=None)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Path to your trained RGB model weights
-trained_model_path = 'runs/3_channel/2024-10-14_18-31-42/best_model_weights.pth'  # Replace with your path
+trained_model_path = 'runs/3_channel/2024-10-15_15-55-43/best_model_weights.pth'  # Replace with your path
 
 # Load the trained model
 model = load_trained_model(trained_model_path)
 
 # Modified validate function to measure inference time
-def validate_with_timing(model, val_loader, device, visualize_results=False):
+def validate_with_timing(model, val_loader, device, visualize_results=True):
     model.eval()
     total_time = 0.0  # To accumulate the total inference time
 
@@ -68,4 +68,5 @@ def validate_with_timing(model, val_loader, device, visualize_results=False):
 
 # Run the validation with timing
 print("Running validation with timing on RGB images...")
-validate_with_timing(model, val_loader, device, visualize_results=False)
+#validate_with_timing(model, val_loader, device, visualize_results=True)
+validate(model, val_loader, device, visualize_results=True)

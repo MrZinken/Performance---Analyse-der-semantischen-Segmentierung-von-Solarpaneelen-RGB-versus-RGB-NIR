@@ -5,12 +5,12 @@ from skimage.draw import polygon
 
 
 # Load the annotation file
-annotation_path = '/home/kai/Documents/dataset/test/_annotations.coco.json'
+annotation_path = '/home/kai/Documents/dataset/valid/_annotations.coco.json'
 with open(annotation_path, 'r') as f:
     annotations = json.load(f)
 
 # Directory containing the numpy array files
-data_dir = '/home/kai/Documents/dataset/test'
+data_dir = '/home/kai/Documents/dataset/valid'
 
 # Parameters for analysis
 surrounding_width = 20

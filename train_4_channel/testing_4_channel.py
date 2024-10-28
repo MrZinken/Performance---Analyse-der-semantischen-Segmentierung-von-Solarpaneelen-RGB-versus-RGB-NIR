@@ -31,7 +31,7 @@ val_dataset = RGBNIRDataset(val_annotations, val_npy_dir, transform=None)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Path to your trained model weights
-trained_model_path = 'runs/4_channel/2024-10-15_14-51-32/best_multimodal_model_weights_red.pth'  # Replace with your path
+trained_model_path = 'runs/4_channel/2024-10-15_14-24-00/best_multimodal_model_weights_red.pth'  # Replace with your path
 
 # Load the trained model
 model = load_trained_model(trained_model_path)
@@ -41,7 +41,7 @@ print("Running validation...")
 start_time = time.time()  # Start timing
 
 # Run the validate function
-validate(model, val_loader, device, visualize_results=False)
+validate(model, val_loader, device, visualize_results=True)
 
 end_time = time.time()  # End timing
 
