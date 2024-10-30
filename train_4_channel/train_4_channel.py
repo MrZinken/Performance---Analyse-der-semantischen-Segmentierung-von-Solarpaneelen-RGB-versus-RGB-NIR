@@ -64,7 +64,7 @@ for run in range(1, n_runs + 1):
     val_loader = get_validation_loader(val_annotations_path, val_npy_dir, batch_size=batch_size)
 
     # Choose the weight initialization method for the NIR channel
-    init_type = "red"  # Change this to "pretrained", "red" or "random" as needed
+    init_type = "red"  # Change this to "pretrained", "red" or "random" as needed Impact questionable
 
     # Create the model with the chosen weight initialization
     model = MultimodalSegmentationModel(num_classes=2, nir_init_method=init_type).to(device)

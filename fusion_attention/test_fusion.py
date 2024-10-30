@@ -1,7 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
 import json
-import os
 from dataset_loader_fusion import RGBNIRDataset
 #from model_fusion import MultimodalSegmentationModel
 from cross_attention_model import MultimodalSegmentationModel
