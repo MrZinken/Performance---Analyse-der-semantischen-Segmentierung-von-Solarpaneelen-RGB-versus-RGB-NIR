@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import sem, t
+from scipy.stats import sem, t, shapiro
 
 # Function to calculate mean and 95% confidence interval
 def mean_confidence_interval(data, confidence=0.95):
@@ -46,6 +46,29 @@ rgb_ir_f1 = [rgb_ir_f1_75, rgb_ir_f1_150, rgb_ir_f1_300]
 
 # X axis: number of images
 x_axis = [75, 150, 300]
+
+# Function for Shapiro-Wilk Test
+def shapiro_test(data):
+    stat, p = shapiro(data)
+    return stat, p
+
+# Calculate Shapiro-Wilk Test results for IoU and F1 data
+shapiro_results = {'Fusion': {'IoU': [], 'F1': []}, 'RGB': {'IoU': [], 'F1': []}, 'RGB + IR': {'IoU': [], 'F1': []}}
+
+# Apply Shapiro-Wilk test on each configuration
+for fusion, rgb, rgbir in zip(fusion_iou, rgb_iou, rgb_ir_iou):
+    shapiro_results['Fusion']['IoU'].append(shapiro_test(fusion))
+    shapiro_results['RGB']['IoU'].append(shapiro_test(rgb))
+    shapiro_results['RGB + IR']['IoU'].append(shapiro_test(rgbir))
+
+for fusion, rgb, rgbir in zip(fusion_f1, rgb_f1, rgb_ir_f1):
+    shapiro_results['Fusion']['F1'].append(shapiro_test(fusion))
+    shapiro_results['RGB']['F1'].append(shapiro_test(rgb))
+    shapiro_results['RGB + IR']['F1'].append(shapiro_test(rgbir))
+
+# Shapiro-Wilk Test results can be printed or logged
+print("Shapiro-Wilk Test Results (p-values indicate normality if > 0.05):")
+print(shapiro_results)
 
 # Create lists for averages and confidence intervals
 iou_means = {'Fusion': [], 'RGB': [], 'RGB + IR': []}
