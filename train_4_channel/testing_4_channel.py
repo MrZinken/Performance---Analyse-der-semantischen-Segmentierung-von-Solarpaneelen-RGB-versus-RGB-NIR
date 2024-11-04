@@ -2,52 +2,56 @@ import torch
 import json
 import time
 from torch.utils.data import DataLoader
-from model_4_channel import MultimodalSegmentationModel  # Import your model
-from dataset_4_channel import RGBNIRDataset  # Import your dataset class
-from validation_4_channel import validate  # Import validation function
+from model_4_channel import MultimodalSegmentationModel  # Model class
+from dataset_4_channel import RGBNIRDataset  # Dataset class
+from validation_4_channel import validate  # Validation function
 
-# Set the device
+# Configure device for model operations
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load the model
+
+# Load a trained model with specified weights
 def load_trained_model(model_path, num_classes=2):
     model = MultimodalSegmentationModel(num_classes=num_classes)
-    model.load_state_dict(torch.load(model_path, map_location=device))  # Load the model weights
-    model.to(device)  # Move model to GPU if available
-    model.eval()  # Set the model to evaluation mode
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.to(device)
+    model.eval()  # Set to evaluation mode
     return model
 
+
+# Path configurations for validation data
+val_annotations_path = (
+    "/home/kai/Documents/dataset/test/_annotations.coco.json"  # Update to your path
+)
+val_npy_dir = "/home/kai/Documents/dataset/test"  # Update to your path
+
 # Load validation annotations
-val_annotations_path = '/home/kai/Documents/dataset/test/_annotations.coco.json'  # Replace with your path
-val_npy_dir = '/home/kai/Documents/dataset/test'  # Replace with your path
+with open(val_annotations_path, "r") as file:
+    val_annotations = json.load(file)
 
-# Load the validation annotations
-with open(val_annotations_path, 'r') as f:
-    val_annotations = json.load(f)
-
-# Initialize the validation dataset and dataloader
+# Initialize validation dataset and data loader
 batch_size = 4
 val_dataset = RGBNIRDataset(val_annotations, val_npy_dir, transform=None)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-# Path to your trained model weights
-trained_model_path = 'runs/4_channel/2024-10-15_14-24-00/best_multimodal_model_weights_red.pth'  # Replace with your path
+# Specify path to trained model weights
+trained_model_path = "runs/4_channel/2024-10-15_14-24-00/best_multimodal_model_weights_red.pth"  # Update as needed
 
-# Load the trained model
+# Load trained model for evaluation
 model = load_trained_model(trained_model_path)
 
-# Run the validation script with timing
-print("Running validation...")
-start_time = time.time()  # Start timing
+# Run validation with timing
+print("Starting validation...")
+start_time = time.time()  # Start timer
 
-# Run the validate function
+# Execute validation
 validate(model, val_loader, device, visualize_results=True)
 
-end_time = time.time()  # End timing
-
-# Calculate and print the total and average inference time
+# Record end time and calculate timing metrics
+end_time = time.time()
 total_inference_time = end_time - start_time
-average_inference_time_per_image = total_inference_time / len(val_dataset)
+avg_inference_time_per_image = total_inference_time / len(val_dataset)
 
+# Display inference timing
 print(f"Total inference time: {total_inference_time:.4f} seconds")
-print(f"Average inference time per image: {average_inference_time_per_image:.4f} seconds")
+print(f"Average inference time per image: {avg_inference_time_per_image:.4f} seconds")

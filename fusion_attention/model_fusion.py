@@ -3,27 +3,31 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.nn.functional as F
 
+
 class ResNet50Backbone(nn.Module):
-    def __init__(self, input_channels: int = 3, pretrained_weights: str = 'red'):
+    def __init__(self, input_channels=3, pretrained_weights="red"):
         super(ResNet50Backbone, self).__init__()
-        # Load the ResNet-50 model
-        if pretrained_weights == 'imagenet':
-            self.backbone = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
+
+        # Initialize ResNet-50 model with or without ImageNet weights
+        if pretrained_weights == "imagenet":
+            self.backbone = models.resnet50(
+                weights=models.ResNet50_Weights.IMAGENET1K_V1
+            )
         else:
             self.backbone = models.resnet50(weights=None)
-        
-        # Modify first convolution layer to match input channels (RGB or NIR)
-        self.backbone.conv1 = nn.Conv2d(input_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
 
-        # Apply custom weights if specified
-        if pretrained_weights == 'red':
-            # Assuming 'red' means using pretrained weights on a red channel; modify as needed.
+        # Adjust the input layer to fit custom channel count (e.g., RGB or NIR)
+        self.backbone.conv1 = nn.Conv2d(
+            input_channels, 64, kernel_size=7, stride=2, padding=3, bias=False
+        )
+
+        # Configure custom weight initialization if required
+        if pretrained_weights == "red":
             self.apply_red_weights()
-        elif pretrained_weights == 'nir_random':
-            # Initialize with random weights for NIR
+        elif pretrained_weights == "nir_random":
             self.apply_random_weights()
-        
-        # Define the feature extractor layers
+
+        # Select main feature extraction layers
         self.feature_extractor = nn.Sequential(
             self.backbone.conv1,
             self.backbone.bn1,
@@ -36,81 +40,102 @@ class ResNet50Backbone(nn.Module):
         )
 
     def apply_red_weights(self):
-        # Custom method to initialize weights based on the red channel, modify as needed
+        # Custom weight adjustment focusing on the red channel
         with torch.no_grad():
-            # Copy the weights from the red channel (assuming red is the first channel in RGB pretrained weights)
-            self.backbone.conv1.weight[:, 0:1, :, :] = self.backbone.conv1.weight[:, 0:1, :, :]
-            # Zero out other channels for the red-only pretrained NIR input
+            # Copy the pretrained weights from the red channel and zero out others
             self.backbone.conv1.weight[:, 1:, :, :] = 0
 
     def apply_random_weights(self):
-        # Reinitialize weights with random values
+        # Initialize weights randomly for specific layers
         self.backbone.apply(self._init_weights)
-        
+
     def _init_weights(self, layer):
+        # Custom initialization method for convolutional and linear layers
         if isinstance(layer, nn.Conv2d) or isinstance(layer, nn.Linear):
-            nn.init.kaiming_normal_(layer.weight, mode='fan_out', nonlinearity='relu')
+            nn.init.kaiming_normal_(layer.weight, mode="fan_out", nonlinearity="relu")
             if layer.bias is not None:
                 nn.init.constant_(layer.bias, 0)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x):
         return self.feature_extractor(x)
 
+
 class FusionAttention(nn.Module):
-    def __init__(self, channels: int = 2048):
+    def __init__(self, channels=2048):
         super(FusionAttention, self).__init__()
-        self.channels = channels
-        self.attention = nn.Sequential(
+        self.attention_layer = nn.Sequential(
             nn.Conv2d(channels * 2, channels, kernel_size=1),
             nn.BatchNorm2d(channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(channels, 2, kernel_size=1),
-            nn.Softmax(dim=1)
+            nn.Softmax(dim=1),
         )
 
-    def forward(self, rgb_features: torch.Tensor, nir_features: torch.Tensor) -> torch.Tensor:
+    def forward(self, rgb_features, nir_features):
+        # Ensure the feature shapes are compatible
         if rgb_features.shape != nir_features.shape:
-            raise ValueError("RGB and NIR features must have the same shape.")
-        
-        fused = torch.cat((rgb_features, nir_features), dim=1)
-        attention_weights = self.attention(fused)
-        rgb_attention, nir_attention = torch.chunk(attention_weights, chunks=2, dim=1)
-        output = rgb_attention * rgb_features + nir_attention * nir_features
-        return output
+            raise ValueError("Shapes of RGB and NIR features must match for fusion.")
+
+        # Merge features for attention calculation
+        combined = torch.cat((rgb_features, nir_features), dim=1)
+        attention_weights = self.attention_layer(combined)
+        rgb_attention, nir_attention = torch.chunk(attention_weights, 2, dim=1)
+
+        # Apply attention scaling to both feature maps
+        return rgb_attention * rgb_features + nir_attention * nir_features
+
 
 class SegmentationHead(nn.Module):
-    def __init__(self, input_channels: int = 2048, num_classes: int = 2):
+    def __init__(self, input_channels=2048, num_classes=2):
         super(SegmentationHead, self).__init__()
-        self.conv1 = nn.Conv2d(input_channels, 256, kernel_size=3, padding=1)
-        self.bn1 = nn.BatchNorm2d(256)
-        self.conv2 = nn.Conv2d(256, num_classes, kernel_size=1)
+        self.conv_block = nn.Sequential(
+            nn.Conv2d(input_channels, 256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(inplace=True),
+        )
+        self.output_layer = nn.Conv2d(256, num_classes, kernel_size=1)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = torch.relu(self.bn1(self.conv1(x)))
-        x = self.conv2(x)
-        return x
+    def forward(self, x):
+        x = self.conv_block(x)
+        return self.output_layer(x)
+
 
 class MultimodalSegmentationModel(nn.Module):
-    def __init__(self, num_classes: int = 2, pretrained_rgb: bool = True, nir_weights: str = 'imagenet'):
+    def __init__(self, num_classes=2, pretrained_rgb=True, nir_weights="imagenet"):
         super(MultimodalSegmentationModel, self).__init__()
-        # Initialize the RGB backbone with ImageNet pretrained weights
-        self.rgb_backbone = ResNet50Backbone(input_channels=3, pretrained_weights='imagenet' if pretrained_rgb else None)
-        # Initialize the NIR backbone with specified pretrained weights
-        self.nir_backbone = ResNet50Backbone(input_channels=1, pretrained_weights=nir_weights)
-        
-        self.fusion_attention = FusionAttention(channels=2048)
-        self.segmentation_head = SegmentationHead(input_channels=2048, num_classes=num_classes)
 
-    def forward(self, fused_image: torch.Tensor) -> torch.Tensor:
-        rgb_image = fused_image[:, :3, :, :]  # RGB channels
-        nir_image = fused_image[:, 3:, :, :]  # NIR channel
-        
+        # Set up RGB and NIR backbones
+        self.rgb_backbone = ResNet50Backbone(
+            input_channels=3, pretrained_weights="imagenet" if pretrained_rgb else None
+        )
+        self.nir_backbone = ResNet50Backbone(
+            input_channels=1, pretrained_weights=nir_weights
+        )
+
+        # Integrate attention mechanism and segmentation head
+        self.fusion_attention = FusionAttention(channels=2048)
+        self.segmentation_head = SegmentationHead(
+            input_channels=2048, num_classes=num_classes
+        )
+
+    def forward(self, fused_image):
+        # Split input into RGB and NIR parts
+        rgb_image, nir_image = fused_image[:, :3, :, :], fused_image[:, 3:, :, :]
+
+        # Extract features from each branch
         rgb_features = self.rgb_backbone(rgb_image)
         nir_features = self.nir_backbone(nir_image)
-        
+
+        # Fuse features with attention mechanism
         fused_features = self.fusion_attention(rgb_features, nir_features)
+
+        # Final segmentation prediction
         output = self.segmentation_head(fused_features)
-        
-        output = F.interpolate(output, size=(fused_image.shape[2], fused_image.shape[3]), mode='bilinear', align_corners=False)
-        
-        return output
+
+        # Resize output to match input dimensions
+        return F.interpolate(
+            output,
+            size=(fused_image.shape[2], fused_image.shape[3]),
+            mode="bilinear",
+            align_corners=False,
+        )

@@ -14,45 +14,44 @@ class RGBDataset(Dataset):
         return len(self.annotations['images'])
 
     def __getitem__(self, idx):
-        # Extract image information
+        # Retrieve image data
         image_info = self.annotations['images'][idx]
         img_name = image_info['file_name']
         img_id = image_info['id']
         
-        
-        # Load the NumPy file and extract only the RGB channels
+        # Load and format RGB image
         npy_path = os.path.join(self.npy_dir, img_name)
         data = np.load(npy_path)
-        rgb_image = data[:, :, :3]  # Use only the first 3 channels (RGB)
+        rgb_image = data[:, :, :3]  # Use only RGB channels
         
-        # Convert to tensor
-        rgb_image = torch.tensor(rgb_image).permute(2, 0, 1)  # (C, H, W)
-
-        # Get the target mask
+        # Format image as tensor
+        rgb_image = torch.tensor(rgb_image).permute(2, 0, 1)  # (C, H, W) format
+        
+        # Generate mask based on target annotations
         target = self.get_target(img_id, rgb_image.shape[1:])
 
-        # Apply transformations (if any)
+        # Apply transformations if defined
         if self.transform:
             rgb_image = self.transform(rgb_image)
 
         return rgb_image.float(), target
 
     def get_target(self, image_id, img_shape):
-        # Retrieve annotations (masks) for the current image
+        # Retrieve and combine all masks for the current image
         anns = [ann for ann in self.annotations['annotations'] if ann['image_id'] == image_id]
         masks = np.zeros(img_shape, dtype=np.uint8)
         
         for ann in anns:
-            # Create mask from annotations
             mask = self.create_mask(ann['segmentation'], img_shape)
-            masks = np.maximum(masks, mask)  # Merge all masks
+            masks = np.maximum(masks, mask)  # Combine masks
         
-        return torch.tensor(masks, dtype=torch.long)  # Target should be long tensor
+        return torch.tensor(masks, dtype=torch.long)
 
     def create_mask(self, segmentation, img_shape):
-        # Create an empty mask
+        # Initialize empty mask and fill with segmentation polygons
         mask = np.zeros(img_shape, dtype=np.uint8)
         for segment in segmentation:
             polygon = np.array(segment).reshape(-1, 2)
             mask = cv2.fillPoly(mask, [polygon.astype(np.int32)], 1)
         return mask
+

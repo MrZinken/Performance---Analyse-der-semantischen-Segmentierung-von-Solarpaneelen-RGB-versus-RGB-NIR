@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
-
+#slices the Tiff files and saves the slices as jpg and npy files
 def slice_image_and_save(input_image_path, output_dir, slice_size=1000, max_slices=100):
     # Extract the base name of the input image without extension
     base_name = os.path.splitext(os.path.basename(input_image_path))[0]

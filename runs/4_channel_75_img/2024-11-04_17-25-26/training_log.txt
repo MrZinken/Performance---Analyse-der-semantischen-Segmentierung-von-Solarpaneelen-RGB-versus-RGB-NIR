@@ -1,0 +1,47 @@
+Dataset size: 75 - No augmentations applied
+Model initialized with NIR method: red
+Epoch 1 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.2379 - Validation Loss: 0.2189
+Epoch Duration: 7.90s - GPU Memory: 530.77 MB
+Cumulative Time: 7.90s
+
+Epoch 2 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.1190 - Validation Loss: 0.1681
+Epoch Duration: 4.59s - GPU Memory: 531.98 MB
+Cumulative Time: 17.64s
+
+Epoch 3 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0886 - Validation Loss: 0.1411
+Epoch Duration: 4.40s - GPU Memory: 530.77 MB
+Cumulative Time: 27.25s
+
+Epoch 4 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0723 - Validation Loss: 0.1283
+Epoch Duration: 4.33s - GPU Memory: 531.98 MB
+Cumulative Time: 36.75s
+
+Epoch 5 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0647 - Validation Loss: 0.1294
+Epoch Duration: 4.36s - GPU Memory: 530.77 MB
+Cumulative Time: 46.26s
+
+Epoch 6 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0572 - Validation Loss: 0.1256
+Epoch Duration: 4.23s - GPU Memory: 531.98 MB
+Cumulative Time: 55.13s
+
+Epoch 7 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0517 - Validation Loss: 0.1331
+Epoch Duration: 4.22s - GPU Memory: 530.77 MB
+Cumulative Time: 64.37s
+
+Epoch 8 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0484 - Validation Loss: 0.1491
+Epoch Duration: 4.39s - GPU Memory: 531.98 MB
+Cumulative Time: 73.47s
+
+Epoch 9 - Batch Size: 3 - Learning Rate: 1e-05
+Training Loss: 0.0442 - Validation Loss: 0.1596
+Epoch Duration: 4.35s - GPU Memory: 530.77 MB
+Cumulative Time: 82.64s
+

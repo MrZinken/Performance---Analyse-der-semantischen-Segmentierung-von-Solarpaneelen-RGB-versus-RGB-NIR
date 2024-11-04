@@ -1,27 +1,25 @@
 from PIL import Image
 import numpy as np
 
+
 def analyze_tiff_bit_depth(tiff_image_path):
-    # TIFF Bild öffnen
     image = Image.open(tiff_image_path)
 
-    # In ein NumPy-Array konvertieren
+    # convert to NumPy-Array
     image_array = np.array(image)
 
-    # Überprüfen der Anzahl der Kanäle (RGB + NIR sollten 4 sein)
+    # Check for four channels
     if image_array.ndim == 3 and image_array.shape[2] == 4:
         print(f"Das Bild hat {image_array.shape[2]} Kanäle.")
     else:
         print("Das Bild hat nicht die erwartete Anzahl an Kanälen (4).")
         return
 
-    # Bit-Tiefe ermitteln (Annahme: gleiche Bit-Tiefe für alle Kanäle)
+    # Check Bit-Depth
     bit_depth = image_array.dtype
-
-    # Ausgabe der Bit-Tiefe
     print(f"Das Bild hat eine Bit-Tiefe von: {bit_depth}")
 
-    # Optional: Einzelne Kanäle (RGB + NIR) anzeigen
+    # Show channels
     r_channel = image_array[:, :, 0]
     g_channel = image_array[:, :, 1]
     b_channel = image_array[:, :, 2]
@@ -32,8 +30,8 @@ def analyze_tiff_bit_depth(tiff_image_path):
     print(f"B-Kanal Min: {b_channel.min()}, Max: {b_channel.max()}")
     print(f"NIR-Kanal Min: {nir_channel.min()}, Max: {nir_channel.max()}")
 
-# Pfad zur TIFF-Datei
-tiff_image_path = '/home/kai/Documents/2slice/62752400.tif'
 
-# Bild analysieren
+# Path to TIFF-Image
+tiff_image_path = "/home/kai/Documents/2slice/62752400.tif"
+
 analyze_tiff_bit_depth(tiff_image_path)
