@@ -2,10 +2,13 @@ import torch
 import json
 import time
 from torch.utils.data import DataLoader
-from model_4_channel import MultimodalSegmentationModel  # Model class
-from dataset_4_channel import RGBNIRDataset  # Dataset class
-from validation_4_channel import validate  # Validation function
+from model_4_channel import MultimodalSegmentationModel
+from dataset_4_channel import RGBNIRDataset
+from validation_4_channel import validate
 
+"""
+tests single model weights
+"""
 # Configure device for model operations
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -20,10 +23,8 @@ def load_trained_model(model_path, num_classes=2):
 
 
 # Path configurations for validation data
-val_annotations_path = (
-    "/home/kai/Documents/dataset/test/_annotations.coco.json"  # Update to your path
-)
-val_npy_dir = "/home/kai/Documents/dataset/test"  # Update to your path
+val_annotations_path = "/home/kai/Documents/dataset/test/_annotations.coco.json"
+val_npy_dir = "/home/kai/Documents/dataset/test"
 
 # Load validation annotations
 with open(val_annotations_path, "r") as file:
@@ -35,7 +36,9 @@ val_dataset = RGBNIRDataset(val_annotations, val_npy_dir, transform=None)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Specify path to trained model weights
-trained_model_path = "runs/4_channel/2024-10-15_14-24-00/best_multimodal_model_weights_red.pth"  # Update as needed
+trained_model_path = (
+    "runs/4_channel/2024-10-15_14-24-00/best_multimodal_model_weights_red.pth"
+)
 
 # Load trained model for evaluation
 model = load_trained_model(trained_model_path)

@@ -10,6 +10,10 @@ from model_rgb import RGBSegmentationModel
 from validation_rgb import validate, get_validation_loader
 from datetime import datetime
 
+"""
+Training of model with auto stopping based on validation loss with 
+Training can be repeated for independent runs 
+"""
 # Select device (GPU if available, otherwise CPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

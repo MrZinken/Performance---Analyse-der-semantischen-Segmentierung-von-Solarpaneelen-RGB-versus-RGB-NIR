@@ -3,6 +3,10 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.nn.functional as F
 
+"""
+RGB-Modell
+"""
+
 
 # Backbone of the model based on ResNet-50, adapted for 3-channel RGB input
 class ResNet50Backbone(nn.Module):

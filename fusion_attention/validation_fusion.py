@@ -7,6 +7,10 @@ import numpy as np
 from tqdm import tqdm
 import torch.nn.functional as F
 
+"""
+Testing with metrics of weights
+"""
+
 
 # Load validation annotations
 def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):

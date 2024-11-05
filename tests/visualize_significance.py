@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import sem, t, shapiro
 
+"""
+visualize and calculate statistical significance
+"""
+
 
 # Function to calculate mean and 95% confidence interval
 def mean_confidence_interval(data, confidence=0.95):

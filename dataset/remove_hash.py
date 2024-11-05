@@ -1,11 +1,13 @@
 import os
 import json
 
+"""
+Remove hash from the filename and change the extension from .jpg to .npy.
+"""
+
 
 def remove_hash_and_change_extension(filename):
-    """
-    Remove hash from the filename and change the extension from .jpg to .npy.
-    """
+
     # Split the filename by '_rf.' to remove the hash
     parts = filename.split("_jpg.rf.")
     if len(parts) == 2:
@@ -55,4 +57,3 @@ def rename_files_and_update_annotations(images_dir):
 images_directory = "/home/kai/Desktop/Downloads/dataset_75"
 
 rename_files_and_update_annotations(images_directory)
-

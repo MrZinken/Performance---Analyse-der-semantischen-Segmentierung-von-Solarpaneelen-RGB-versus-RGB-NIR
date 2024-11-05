@@ -1,7 +1,12 @@
 import os
 import shutil
 import json
-#Copies the npy files to the folder of dataset with the 
+
+"""
+Copies the npy files to the folder of dataset with the 
+"""
+
+
 def find_and_copy_and_rename_numpy_arrays(annotation_file, numpy_dir, target_dir):
     # Load the annotation file to extract the relevant file names
     with open(annotation_file, "r") as f:

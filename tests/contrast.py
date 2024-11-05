@@ -3,6 +3,9 @@ import numpy as np
 import os
 from skimage.draw import polygon
 
+"""
+calculates the average brightness and stdev of the mask of the annotations of the dataset as well as the sourrounding given by width
+"""
 # Main directory containing subfolders with annotations and numpy files
 main_dir = "/home/kai/Documents/dataset"  # Replace this with your main directory path
 

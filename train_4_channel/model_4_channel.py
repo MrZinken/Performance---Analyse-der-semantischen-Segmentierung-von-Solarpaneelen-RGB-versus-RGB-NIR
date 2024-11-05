@@ -3,7 +3,9 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.nn.functional as F
 
-
+"""
+RGB+NIR-Model
+"""
 # ResNet50 Backbone for 4-channel input (RGB + NIR)
 class ResNet50Backbone(nn.Module):
     def __init__(self, input_channels=4, nir_init="red"):

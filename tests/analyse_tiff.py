@@ -1,6 +1,8 @@
 from PIL import Image
 import numpy as np
-
+"""
+analyzing of Tiff raw files
+"""
 
 def analyze_tiff_bit_depth(tiff_image_path):
     image = Image.open(tiff_image_path)

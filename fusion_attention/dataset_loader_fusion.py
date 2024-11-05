@@ -3,6 +3,9 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 import cv2
+"""
+loads Dataset for Fusion Modell
+"""
 
 class RGBNIRDataset(Dataset):
     def __init__(self, annotations, npy_dir, transform=None):
@@ -11,24 +14,24 @@ class RGBNIRDataset(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return len(self.annotations['images'])
+        return len(self.annotations["images"])
 
     def __getitem__(self, idx):
         # Extract image information
-        image_info = self.annotations['images'][idx]
-        img_name = image_info['file_name']  
-        img_id = image_info['id']
-        
+        image_info = self.annotations["images"][idx]
+        img_name = image_info["file_name"]
+        img_id = image_info["id"]
+
         # Load the NumPy file containing RGB + NIR channels
         npy_path = os.path.join(self.npy_dir, img_name)
         if not os.path.exists(npy_path):
             raise FileNotFoundError(f"NumPy file {npy_path} not found.")
-        
+
         data = np.load(npy_path)
-        
+
         # Separate RGB and NIR channels
         rgb_image = data[:, :, :3]  # RGB channels
-        nir_image = data[:, :, 3]   # NIR channel
+        nir_image = data[:, :, 3]  # NIR channel
 
         # Convert both images to tensors and permute to (C, H, W)
         rgb_image = torch.tensor(rgb_image).permute(2, 0, 1)  # (3, H, W)
@@ -48,14 +51,18 @@ class RGBNIRDataset(Dataset):
 
     def get_target(self, image_id, img_shape):
         # Find the annotations for this image and create the mask
-        anns = [ann for ann in self.annotations['annotations'] if ann['image_id'] == image_id]
+        anns = [
+            ann
+            for ann in self.annotations["annotations"]
+            if ann["image_id"] == image_id
+        ]
         masks = np.zeros(img_shape, dtype=np.uint8)
-        
+
         for ann in anns:
-            mask = self.create_mask(ann['segmentation'], img_shape)
+            mask = self.create_mask(ann["segmentation"], img_shape)
             masks = np.maximum(masks, mask)
-        
-        return torch.tensor(masks, dtype=torch.long) 
+
+        return torch.tensor(masks, dtype=torch.long)
 
     def create_mask(self, segmentation, img_shape):
         # Create a binary mask for each segmented object

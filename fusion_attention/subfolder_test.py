@@ -6,7 +6,9 @@ from torch.utils.data import DataLoader
 from cross_attention_model import MultimodalSegmentationModel
 from dataset_loader_fusion import RGBNIRDataset
 from validation_fusion import validate
-
+"""
+Tests all weights in different subfolders
+"""
 # Set the device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -117,7 +119,7 @@ def process_all_models_in_directory(base_dir, test_annotations_path, test_npy_di
 
 # Main function
 if __name__ == "__main__":
-    base_dir = 'runs/cross_fusion_150_img/'  # Replace with your base directory path
+    base_dir = 'runs/cross_fusion_150_img/'  # Replace with base directory path
     test_annotations_path = '/home/kai/Documents/dataset_150/test/_annotations.coco.json'
     test_npy_dir = '/home/kai/Documents/dataset_150/test'
 

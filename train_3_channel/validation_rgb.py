@@ -5,6 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from dataset_rgb import RGBDataset
 
+"""
+Testing with metrics of weights
+"""
+
 
 # Load validation data
 def get_validation_loader(val_annotations_path, val_npy_dir, batch_size=4):

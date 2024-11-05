@@ -4,6 +4,10 @@ import torch
 from torch.utils.data import Dataset
 import cv2
 
+"""
+loads numpy dataset
+"""
+
 
 class RGBNIRDataset(Dataset):
     def __init__(self, annotations, npy_dir, transform=None):

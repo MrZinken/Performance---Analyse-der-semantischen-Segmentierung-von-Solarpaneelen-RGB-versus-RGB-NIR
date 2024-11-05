@@ -2,10 +2,13 @@ import torch
 import json
 import time
 from torch.utils.data import DataLoader
-from model_rgb import RGBSegmentationModel  # Import RGB model
-from dataset_rgb import RGBDataset  # Import RGB dataset class
-from validation_rgb import validate, get_validation_loader  # RGB validation functions
+from model_rgb import RGBSegmentationModel
+from dataset_rgb import RGBDataset
+from validation_rgb import validate, get_validation_loader
 
+"""
+tests single model weights
+"""
 # Device configuration
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -20,10 +23,8 @@ def load_trained_model(model_path, num_classes=2):
 
 
 # Load validation data
-val_annotations_path = (
-    "/home/kai/Documents/dataset/test/_annotations.coco.json"  # Update with actual path
-)
-val_npy_dir = "/home/kai/Documents/dataset/test"  # Update with actual path
+val_annotations_path = "/home/kai/Documents/dataset/test/_annotations.coco.json"
+val_npy_dir = "/home/kai/Documents/dataset/test"
 
 # Read validation annotations
 with open(val_annotations_path, "r") as f:
@@ -35,7 +36,7 @@ val_dataset = RGBDataset(val_annotations, val_npy_dir)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Load model weights
-model_path = "runs/3_channel/2024-10-15_15-55-43/best_model_weights.pth"  # Update with actual path
+model_path = "runs/3_channel/2024-10-15_15-55-43/best_model_weights.pth"
 model = load_trained_model(model_path)
 
 

@@ -10,6 +10,10 @@ from validation_fusion import validate, get_validation_loader
 from datetime import datetime
 import torch.nn.functional as F
 
+"""
+Training of model with auto stopping based on validation loss with 
+Training can be repeated for independent runs 
+"""
 # Define device for computations
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

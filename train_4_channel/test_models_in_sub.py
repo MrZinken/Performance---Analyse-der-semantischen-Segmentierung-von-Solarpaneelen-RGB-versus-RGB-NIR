@@ -7,6 +7,9 @@ from model_4_channel import MultimodalSegmentationModel
 from dataset_4_channel import RGBNIRDataset
 from validation_4_channel import validate
 
+"""
+Tests all weights in different subfolders
+"""
 # Device setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -89,10 +92,10 @@ def validate_models_in_directory(base_dir, annotations_path, npy_dir):
     log_results(metrics, os.path.join(base_dir, "model_metrics_summary.txt"))
 
 
-# Execution entry point
+
 if __name__ == "__main__":
-    base_dir = "runs/4_channel_75_img/"  # Set model directory path
-    annotations_path = "/home/kai/Documents/dataset_75/test/_annotations.coco.json"  # Set annotations path
-    npy_dir = "/home/kai/Documents/dataset_75/test"  # Set data directory
+    base_dir = "runs/4_channel_75_img/"  
+    annotations_path = "/home/kai/Documents/dataset_75/test/_annotations.coco.json"  
+    npy_dir = "/home/kai/Documents/dataset_75/test"  
 
     validate_models_in_directory(base_dir, annotations_path, npy_dir)

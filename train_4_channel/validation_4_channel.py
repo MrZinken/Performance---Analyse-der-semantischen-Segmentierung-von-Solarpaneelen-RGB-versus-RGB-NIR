@@ -4,7 +4,9 @@ import json
 from dataset_4_channel import RGBNIRDataset
 import matplotlib.pyplot as plt
 import numpy as np
-
+"""
+Testing with metrics of weights
+"""
 
 # Function to load validation data
 def prepare_validation_loader(annotation_path, npy_dir, batch_size=4):
