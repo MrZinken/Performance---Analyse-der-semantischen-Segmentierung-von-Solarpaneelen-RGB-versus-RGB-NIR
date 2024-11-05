@@ -7,13 +7,14 @@ import os
 import psutil
 from dataset_4_channel import RGBNIRDataset
 from model_4_channel import MultimodalSegmentationModel
-from validation_4_channel import validate, get_validation_loader
+from validation_4_channel import evaluate, prepare_validation_loader
 from datetime import datetime
 
 """
 Training of model with auto stopping based on validation loss with 
 Training can be repeated for independent runs 
 """
+
 # Select device based on availability
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -66,13 +67,13 @@ for count in range(1, n_repeats + 1):
     train_ds = RGBNIRDataset(train_data, train_path)
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 
-    val_loader = get_validation_loader(val_annotations, val_path, batch_size=batch_size)
-
+    val_loader = prepare_validation_loader(val_annotations, val_path, batch_size=batch_size)
+ 
     # Select NIR weight initialization type
     nir_init = "red"  # Options: "pretrained", "red", "random"
 
     # Initialize model
-    model = MultimodalSegmentationModel(num_classes=2, nir_init_method=nir_init).to(
+    model = MultimodalSegmentationModel(num_classes=2, nir_init=nir_init).to(
         device
     )
 
@@ -126,7 +127,7 @@ for count in range(1, n_repeats + 1):
         )
 
         # Validate and log performance
-        validation = validate(model, val_loader, device)
+        validation = evaluate(model, val_loader, device)
         val_loss = validation["Validation Loss"]
 
         print(

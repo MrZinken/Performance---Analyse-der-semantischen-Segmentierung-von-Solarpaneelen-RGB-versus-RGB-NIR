@@ -1,0 +1,10 @@
+Training Configuration:
+Model Name: MultimodalSegmentationModel
+Run: 1
+Batch Size: 3
+Learning Rate: 1e-05
+Epochs: 100
+Patience: 5
+
+Epoch, Loss, Validation Loss, Time (s), GPU Memory (MB)
+1, 0.6429, 0.6066, 8.26, 1175.85

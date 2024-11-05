@@ -4,6 +4,7 @@ import json
 from dataset_4_channel import RGBNIRDataset
 import matplotlib.pyplot as plt
 import numpy as np
+
 """
 Testing with metrics of weights
 """

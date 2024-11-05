@@ -1,0 +1,2 @@
+Dataset size: 75 - No augmentations applied
+Model initialized with NIR method: red
