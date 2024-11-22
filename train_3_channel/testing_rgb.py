@@ -66,5 +66,5 @@ def validate_with_timing(model, val_loader, device):
 
 # Run validation with timing
 print("Starting validation with timing on RGB images...")
-validate_with_timing(model, val_loader, device)
+#validate_with_timing(model, val_loader, device)
 validate(model, val_loader, device, visualize_results=True)

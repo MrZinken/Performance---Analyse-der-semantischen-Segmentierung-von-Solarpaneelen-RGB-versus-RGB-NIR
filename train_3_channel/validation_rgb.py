@@ -30,19 +30,26 @@ def validate(model, val_loader, device, visualize_results=True):
             output = model(fused_image)
             pred = torch.argmax(output, dim=1)
 
-            ious.append(calculate_iou(pred, target).cpu().numpy())
-            precision, recall, f1_score = calculate_metrics(pred, target)
-            precisions.append(precision.cpu().numpy())
-            recalls.append(recall.cpu().numpy())
-            f1s.append(f1_score.cpu().numpy())
+            # Append mean IoU for the batch
+            iou = calculate_iou(pred, target).mean().cpu().numpy()
+            ious.append(iou)
 
+            # Calculate and append mean precision, recall, F1 score for the batch
+            precision, recall, f1_score = calculate_metrics(pred, target)
+            precisions.append(precision.mean().cpu().numpy())
+            recalls.append(recall.mean().cpu().numpy())
+            f1s.append(f1_score.mean().cpu().numpy())
+
+            # Compute loss
             loss = criterion(output, target)
             total_loss += loss.item()
 
+            # Visualization
             if visualize_results:
                 visualize(
                     fused_image.cpu().numpy(), pred.cpu().numpy(), target.cpu().numpy()
                 )
+
 
     avg_metrics = {
         "IoU": np.mean(ious),
