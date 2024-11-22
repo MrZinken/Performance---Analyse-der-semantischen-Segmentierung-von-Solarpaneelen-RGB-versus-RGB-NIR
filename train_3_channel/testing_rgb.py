@@ -36,7 +36,7 @@ val_dataset = RGBDataset(val_annotations, val_npy_dir)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Load model weights
-model_path = "runs/3_channel/2024-10-15_15-55-43/best_model_weights.pth"
+model_path = "runs/3_channel/2024-10-15_16-06-32/best_model_weights.pth"
 model = load_trained_model(model_path)
 
 

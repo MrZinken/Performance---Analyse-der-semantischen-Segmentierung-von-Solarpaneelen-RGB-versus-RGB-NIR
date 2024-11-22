@@ -21,7 +21,7 @@ def prepare_validation_loader(annotation_path, npy_dir, batch_size=4):
 
 
 # Function to evaluate model on validation set
-def evaluate(model, loader, device, display_results=False):
+def evaluate(model, loader, device, visualize_results=True):
     model.eval()
     iou_scores, precision_scores, recall_scores, f1_scores = [], [], [], []
     cumulative_loss = 0.0
@@ -49,7 +49,7 @@ def evaluate(model, loader, device, display_results=False):
             cumulative_loss += loss.item()
 
             # Optional result visualization
-            if display_results:
+            if visualize_results:
                 show_results(
                     images.cpu().numpy(),
                     predicted_mask.cpu().numpy(),

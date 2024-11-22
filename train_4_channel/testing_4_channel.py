@@ -4,7 +4,7 @@ import time
 from torch.utils.data import DataLoader
 from model_4_channel import MultimodalSegmentationModel
 from dataset_4_channel import RGBNIRDataset
-from validation_4_channel import validate
+from validation_4_channel import evaluate
 
 """
 tests single model weights
@@ -37,7 +37,7 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 # Specify path to trained model weights
 trained_model_path = (
-    "runs/4_channel/2024-10-15_14-24-00/best_multimodal_model_weights_red.pth"
+    "runs/4_channel/2024-10-15_14-51-32/best_multimodal_model_weights_red.pth"
 )
 
 # Load trained model for evaluation
@@ -48,7 +48,7 @@ print("Starting validation...")
 start_time = time.time()  # Start timer
 
 # Execute validation
-validate(model, val_loader, device, visualize_results=True)
+evaluate(model, val_loader, device, visualize_results=True)
 
 # Record end time and calculate timing metrics
 end_time = time.time()

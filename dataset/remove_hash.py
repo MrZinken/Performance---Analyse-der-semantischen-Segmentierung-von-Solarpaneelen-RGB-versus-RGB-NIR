@@ -54,6 +54,6 @@ def rename_files_and_update_annotations(images_dir):
 
 
 # Usage example
-images_directory = "/home/kai/Desktop/Downloads/dataset_75"
+images_directory = "/home/kai/Documents/dataset"
 
 rename_files_and_update_annotations(images_directory)

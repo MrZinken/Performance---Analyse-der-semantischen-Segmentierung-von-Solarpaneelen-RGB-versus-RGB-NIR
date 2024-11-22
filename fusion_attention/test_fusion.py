@@ -35,7 +35,7 @@ def get_testing_loader(test_annotations_path, test_npy_dir, batch_size=1):
 if __name__ == "__main__":
     # Paths to the model and testing data
     best_model_weights_path = (
-        "runs/cross_fusion/2024-10-15_14-57-39/best_model_weights.pth"
+        "runs/cross_fusion/2024-10-21_11-14-23/best_model_weights.pth"
     )
     test_annotations_path = "/home/kai/Documents/dataset/test/_annotations.coco.json"
     test_npy_dir = "/home/kai/Documents/dataset/test"

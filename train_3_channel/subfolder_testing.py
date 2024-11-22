@@ -98,8 +98,8 @@ def process_all_models_in_directory(base_dir, val_annotations_path, val_npy_dir)
 
 # Execute the script
 if __name__ == "__main__":
-    base_dir = "runs/3_channel_75_img"
-    val_annotations_path = "/home/kai/Documents/dataset_75/test/_annotations.coco.json"
-    val_npy_dir = "/home/kai/Documents/dataset_75/test"
+    base_dir = "runs/3_channel"
+    val_annotations_path = "/home/kai/Documents/dataset_300/test/_annotations.coco.json"
+    val_npy_dir = "/home/kai/Documents/dataset_300/test"
 
     process_all_models_in_directory(base_dir, val_annotations_path, val_npy_dir)

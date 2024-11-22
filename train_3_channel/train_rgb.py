@@ -173,7 +173,7 @@ def run_multiple_trainings(num_trainings, num_epochs):
 
 
 # Set the number of runs and epochs
-num_trainings = 10
+num_trainings = 1
 num_epochs = 100
 
 # Execute the training runs
